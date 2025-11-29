@@ -1,0 +1,121 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Assistir Anúncio</title>
+
+<style>
+    body {
+        margin: 0;
+        background: #f5f6f7;
+        font-family: Arial;
+        text-align: center;
+        padding: 20px;
+    }
+
+    h2 { margin-bottom: 10px; }
+
+    .clock {
+        width: 140px;
+        height: 140px;
+        border: 8px solid #0d6efd;
+        border-radius: 50%;
+        margin: 20px auto;
+        position: relative;
+        background: white;
+    }
+
+    .hand {
+        width: 3px;
+        height: 60px;
+        background: #dc3545;
+        position: absolute;
+        top: 10px;
+        left: 50%;
+        transform-origin: bottom;
+        transform: translateX(-50%) rotate(0deg);
+        transition: all linear;
+    }
+
+    #confirmBtn {
+        display: none;
+        padding: 12px 25px;
+        background: #198754;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+</style>
+
+</head>
+<body onload="startTimer()">
+
+<h2>Assistindo Anúncio...</h2>
+<p id="timeInfo">Carregando...</p>
+
+<div class="clock">
+    <div class="hand" id="hand"></div>
+</div>
+
+<button id="confirmBtn" onclick="creditUser()">CONFIRMAR CRÉDITO</button>
+
+<script>
+let duration = 30; // tempo padrão
+let secondsLeft = duration;
+let rotateStep = 360 / duration;
+
+// Impede refresh para ganhar crédito
+if (sessionStorage.getItem("watched") === "1") {
+    document.body.innerHTML = "<h2>❌ Crédito já computado!</h2>";
+}
+
+function startTimer() {
+
+    // Ler tempo do anúncio via URL (ex: viewad.html?id=1&time=30)
+    const params = new URLSearchParams(location.search);
+    const t = params.get("time");
+    if (t) { duration = parseInt(t); secondsLeft = duration; }
+
+    document.getElementById("timeInfo").innerText =
+        "Aguarde " + duration + " segundos...";
+
+    const hand = document.getElementById("hand");
+    let angle = 0;
+
+    let timer = setInterval(() => {
+        secondsLeft--;
+        angle += rotateStep;
+
+        hand.style.transform =
+            `translateX(-50%) rotate(${angle}deg)`;
+
+        document.getElementById("timeInfo").innerText =
+            secondsLeft + " segundos restantes...";
+
+        if (secondsLeft <= 0) {
+            clearInterval(timer);
+            finishTimer();
+        }
+    }, 1000);
+}
+
+function finishTimer() {
+    document.getElementById("timeInfo").innerText =
+        "Tempo completo!";
+    document.getElementById("confirmBtn").style.display = "inline-block";
+}
+
+function creditUser() {
+    sessionStorage.setItem("watched", "1");
+
+    alert("✔ Crédito adicionado à sua conta!");
+    window.location.href = "viewads.html";
+}
+</script>
+
+</body>
+</html>
