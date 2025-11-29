@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>View Ad</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f4f4f4;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+
+    #windowBox {
+        width: 350px;
+        background: #ffffff;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        padding: 20px;
+        text-align: center;
+    }
+
+    #title {
+        font-size: 22px;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+
+    #desc {
+        font-size: 15px;
+        margin-bottom: 20px;
+    }
+
+    #clock {
+        width: 120px;
+        height: 120px;
+        border: 6px solid #333;
+        border-radius: 50%;
+        margin: 0 auto 20px;
+        position: relative;
+    }
+
+    .hand {
+        position: absolute;
+        width: 50%;
+        height: 3px;
+        background: #333;
+        top: 50%;
+        transform-origin: 100%;
+        transform: rotate(0deg);
+        transition: all linear;
+    }
+
+    #secondHand {
+        height: 2px;
+        background: red;
+    }
+
+    #timerText {
+        font-size: 18px;
+        margin-top: 10px;
+        font-weight: bold;
+    }
+
+    #finishBtn {
+        display: none;
+        margin-top: 20px;
+        padding: 10px 20px;
+        background: #28a745;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+    }
+</style>
+</head>
+<body onload="loadAd()">
+
+<div id="windowBox">
+    <div id="title">Carregando anúncio...</div>
+    <div id="desc"></div>
+
+    <div id="clock">
+        <div id="secondHand" class="hand"></div>
+    </div>
+
+    <div id="timerText">Iniciando...</div>
+
+    <button id="finishBtn" onclick="finishAd()">Receber Crédito</button>
+</div>
+
+<script>
+    const adData = {
+        1: { title: "FuseBux", desc: "Think Different... Think BIG!", time: 60 },
+        2: { title: "eToro", desc: "Earn money fast", time: 30 },
+        3: { title: "CryptoBoost", desc: "Daily rewards waiting", time: 30 },
+        4: { title: "TaskPro", desc: "Complete tasks and earn", time: 15 },
+        5: { title: "MegaAds", desc: "Unlimited bonuses everyday", time: 60 }
+    };
+
+    let countdown = 0;
+    let interval;
+    let angle = 0;
+
+    function loadAd() {
+        const params = new URLSearchParams(window.location.search);
+        const id = params.get("id");
+        const ad = adData[id];
+
+        if (!ad) {
+            document.getElementById("title").innerText = "Anúncio não encontrado";
+            return;
+        }
+
+        document.getElementById("title").innerText = ad.title;
+        document.getElementById("desc").innerText = ad.desc;
+
+        countdown = ad.time;
+        document.getElementById("timerText").innerText = `Tempo: ${countdown}s`;
+
+        startTimer();
+    }
+
+    function startTimer() {
+        interval = setInterval(() => {
+            countdown--;
+            angle += 6; // 6 graus = 1 segundo
+            document.getElementById("secondHand").style.transform = `rotate(${angle}deg)`;
+
+            document.getElementById("timerText").innerText = `Tempo: ${countdown}s`;
+
+            if (countdown <= 0) {
+                clearInterval(interval);
+                document.getElementById("timerText").innerText = "Concluído!";
+                document.getElementById("finishBtn").style.display = "block";
+            }
+        }, 1000);
+    }
+
+    function finishAd() {
+        alert("Crédito recebido com sucesso!");
+        window.location.href = "ads.html";
+    }
+</script>
+
+</body>
+</html>

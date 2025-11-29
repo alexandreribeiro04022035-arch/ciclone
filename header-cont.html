@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Header ProBux Style</title>
+
+<style>
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #f0f0f0;
+    }
+
+    /* HEADER AZUL */
+    .top-header {
+        background: #023b78;
+        color: white;
+        padding: 10px 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+    }
+
+    .top-header img {
+        height: 40px;
+    }
+
+    .top-links {
+        display: flex;
+        gap: 25px;
+        font-size: 16px;
+    }
+
+    .top-links a {
+        color: white;
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+    .top-links a:hover {
+        text-decoration: underline;
+    }
+
+    /* BARRA DESLIZANTE */
+    .marquee-box {
+        background: #012d5c;
+        color: white;
+        padding: 6px 0;
+        overflow: hidden;
+        white-space: nowrap;
+        font-size: 14px;
+    }
+
+    .marquee {
+        display: inline-block;
+        animation: slide 20s linear infinite;
+    }
+
+    @keyframes slide {
+        0% { transform: translateX(100%); }
+        100% { transform: translateX(-100%); }
+    }
+
+    /* TIMER NO CABEÇALHO */
+    #timerHeader {
+        background: #0051aa;
+        padding: 5px;
+        text-align: center;
+        color: #fff;
+        font-size: 18px;
+        font-weight: bold;
+    }
+</style>
+
+</head>
+<body>
+
+<!-- HEADER SUPERIOR -->
+<div class="top-header">
+    <img src="https://via.placeholder.com/140x40?text=ProBux" alt="logo">
+
+    <div class="top-links">
+        <a href="login-botton.html"   target="_top"   >Minha Conta</a>
+        <a href="viewads.html"  target="_top"   >Ganhe Dinheiro</a>
+        <a href="header-moderno.html"    >MAIS</a>
+    </div>
+</div>
+
+<!-- BARRA DESLIZANTE -->
+<div class="marquee-box">
+    <div class="marquee">
+        🔔 4 minutos atrás —> usuário123 ganhou $0.005 em anúncios fixos • 
+        7 minutos atrás —> user555 ganhou $0.010 em anúncios bônus • 
+        9 minutos atrás —> pedro001 ganhou $0.005 na oferta diária 🔔
+    </div>
+</div>
+
+<!-- TIMER 30s NO CABEÇALHO -->
+<div id="timerHeader">⏱ Tempo restante: 30s</div>
+
+<script>
+    // TIMER DO CABEÇALHO
+    let time = 30;
+    let timer = setInterval(() => {
+        time--;
+        document.getElementById("timerHeader").innerHTML = "⏱ Tempo restante: " + time + "s";
+
+        if (time <= 0) {
+            clearInterval(timer);
+            document.getElementById("timerHeader").innerHTML = "✔ Anúncio concluído!";
+        }
+    }, 1000);
+</script>
+
+</body>
+</html>
