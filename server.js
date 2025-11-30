@@ -64,6 +64,31 @@ app.get("/api/test", (req, res) => {
 // Aqui você pode adicionar suas rotas reais do cadastro, login, clicks, etc.
 // Exemplo:
 // app.post("/api/cadastro", async (req, res) => { ... });
+// rota do cadastro neon 
+app.post("/api/cadastro", async (req, res) => {
+    const { nome, email, senha, chavepix, telefone, avatar } = req.body;
+
+    try {
+        const result = await pool.query(
+            `INSERT INTO cadastro (nome, email, senha, chavepix, telefone, avatar)
+             VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+            [nome, email, senha, chavepix, telefone, avatar]
+        );
+        res.json({ success: true, user: result.rows[0] });
+    } catch (error) {
+        console.error("Erro no cadastro:", error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+
+
+
+
+
+
+
+
 
 // ----------------------------
 // INICIAR SERVIDOR
