@@ -132,3 +132,39 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+
+// ===== ROTA LOGIN =====
+app.post('/api/login', async (req, res) => {
+  const { email, senha } = req.body;
+  
+  try {
+    const result = await pool.query(
+      'SELECT * FROM cadastro WHERE email = $1 AND senha = $2',
+      [email, senha]
+    );
+    
+    if (result.rows.length === 0) {
+      return res.status(401).json({ success: false, error: 'Email ou senha inválidos' });
+    }
+    
+    const user = result.rows[0];
+    // Aqui geraria JWT token (implementar depois)
+    
+    res.json({ 
+      success: true, 
+      user: {
+        id: user.id,
+        nome: user.nome,
+        email: user.email,
+        saldo: user.saldo_redisponivel || 0
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+
+
+
