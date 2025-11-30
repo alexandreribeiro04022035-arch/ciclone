@@ -42,14 +42,20 @@ async function fazerLogin() {
 
     try {
         // CONSULTA DIRETO NA TABELA CADASTRO
-        const resposta = await fetch('https://ciclone-62mq.onrender.com/api/login-direct', {
+    const resposta = await fetch('https://ciclone-62mq.onrender.com/api/login-completo', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ email, senha })
+});
+        
+        /*  const resposta = await fetch('https://ciclone-62mq.onrender.com/api/login-direct', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
                 email: email, 
                 senha: senha 
             })
-        });
+        });   */
 
         const dados = await resposta.json();
 
