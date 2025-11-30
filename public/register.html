@@ -37,7 +37,6 @@
     <p>R$ 0,0001 por click direto no PIX</p>
 </div>
 
-
 <script>
 async function fazerRegistro() {
     const nome = document.getElementById('nome').value.trim();
@@ -47,16 +46,26 @@ async function fazerRegistro() {
     const telefone = document.getElementById('telefone').value.trim();
     const avatar = document.getElementById('avatar').value.trim();
 
-    if (!nome || !email || !senha || !chavepix || !telefone) {
-        alert('Preencha todos os campos!');
+    if (!nome || !email || !senha) {
+        alert('Preencha pelo menos nome, email e senha!');
         return;
     }
 
     try {
-        const resposta = await fetch('https://ciclone-62mq.onrender.com/api/cadastro', {
+        const resposta = await fetch('/api/cadastro', { // rota relativa
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ nome, email, senha, chavepix, telefone, avatar })
+            body: JSON.stringify({ 
+                nome, 
+                email, 
+                senha, 
+                chavepix: chavepix || null, 
+                telefone: telefone || null, 
+                avatar: avatar || null,
+                recebendo_creditos: false,
+                limite_atingido: false,
+                saldo_redisponivel: 0.00
+            })
         });
 
         const dados = await resposta.json();
@@ -72,46 +81,6 @@ async function fazerRegistro() {
     }
 }
 </script>
-
-
-
-    
-<!---------
-    script>
-async function fazerRegistro() {
-    const nome = document.getElementById('nome').value.trim();
-    const email = document.getElementById('email').value.trim();
-    const senha = document.getElementById('senha').value.trim();
-    const chavepix = document.getElementById('chavepix').value.trim();
-    const telefone = document.getElementById('telefone').value.trim();
-    const avatar = document.getElementById('avatar').value.trim();
-
-    if (!nome || !email || !senha || !chavepix || !telefone) {
-        alert('Preencha todos os campos!');
-        return;
-    }
-
-    try {
-        const resposta = await fetch('https://ciclone-backend.onrender.com/api/cadastro', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ nome, email, senha, chavepix, telefone, avatar })
-        });
-
-        const dados = await resposta.json();
-
-        if (dados.success) {
-            alert('Conta criada com sucesso!');
-            window.location.href = 'login-top.html';
-        } else {
-            alert('Erro: ' + dados.error);
-        }
-    } catch (erro) {
-        alert('Erro de conexão: ' + erro.message);
-    }
-}
-</script
-    --------->
 
 </body>
 </html>
