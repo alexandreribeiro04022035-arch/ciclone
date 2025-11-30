@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: ciclone-backend
+    env: node
+    plan: free
+    region: us-east-1
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        value: "postgresql://neondb_owner:npg_UFGAytfcx18I@ep-withered-field-a4765qib-pooler.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
+      - key: JWT_SECRET
+        generateValue: true
+      - key: PORT
+        value: 3000
