@@ -1,18 +1,21 @@
 from fastapi import FastAPI
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
+import os
 
 app = FastAPI()
 
-# Monta a pasta static para CSS e JS
-app.mount("/static", StaticFiles(directory="static"), name="static")
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# Serve index.html da pasta templates
+# Monta static para CSS/JS
+app.mount("/static", StaticFiles(directory=os.path.join(BASE_DIR, "static")), name="static")
+
+# Index
 @app.get("/")
 def serve_index():
-    return FileResponse("templates/index.html")
+    return FileResponse(os.path.join(BASE_DIR, "templates", "index.html"))
 
-# Serve register.html da pasta templates
+# Registro
 @app.get("/register")
 def serve_register():
-    return FileResponse("templates/register.html")
+    return FileResponse(os.path.join(BASE_DIR, "templates", "register.html"))
