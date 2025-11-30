@@ -217,6 +217,146 @@ app.get('/api/health', async (req, res) => {
 });
 
 // =============================
+// 🎯 SISTEMA DE CLICKS E CRÉDITOS AUTOMÁTICO
+// =============================
+app.post('/api/registrar-click', async (req, res) => {
+  const { email, anuncio_id } = req.body;
+
+  try {
+    // 1. ENCONTRA O USUÁRIO COM MENOR ID QUE RECEBE CRÉDITOS
+    const usuarioCreditoResult = await pool.query(
+      `SELECT * FROM cadastro 
+       WHERE recebendo_creditos = true AND limite_atingido = false 
+       ORDER BY id ASC LIMIT 1`
+    );
+
+    if (usuarioCreditoResult.rows.length === 0) {
+      return res.json({ success: false, error: 'Nenhum usuário recebendo créditos no momento' });
+    }
+
+    const usuarioCredito = usuarioCreditoResult.rows[0];
+
+    // 2. ATUALIZA CLICKS DO USUÁRIO QUE CLICOU
+    const existing = await pool.query('SELECT * FROM clicks WHERE email = $1', [email]);
+    
+    if (existing.rows.length > 0) {
+      await pool.query(
+        `UPDATE clicks SET total_clicks = total_clicks + 1, clicks_hoje = clicks_hoje + 1, data_ultimo_click = CURRENT_TIMESTAMP WHERE email = $1`,
+        [email]
+      );
+    } else {
+      await pool.query(
+        `INSERT INTO clicks (email, total_clicks, clicks_hoje, data_ultimo_click) VALUES ($1, 1, 1, CURRENT_TIMESTAMP)`,
+        [email]
+      );
+    }
+
+    // 3. ADICIONA R$ 0,0001 AO SALDO DO USUÁRIO COM MENOR ID
+    const novoSaldo = parseFloat(usuarioCredito.saldo_redisponivel) + 0.0001;
+    
+    await pool.query(
+      'UPDATE cadastro SET saldo_redisponivel = $1 WHERE id = $2',
+      [novoSaldo, usuarioCredito.id]
+    );
+
+    // 4. VERIFICA SE ATINGIU O LIMITE DE R$ 1000,00
+    if (novoSaldo >= 1000.00) {
+      await pool.query(
+        'UPDATE cadastro SET limite_atingido = true, recebendo_creditos = false WHERE id = $1',
+        [usuarioCredito.id]
+      );
+
+      // 5. PASSA PARA O PRÓXIMO USUÁRIO COM MENOR ID
+      const proximoUsuarioResult = await pool.query(
+        `SELECT * FROM cadastro 
+         WHERE recebendo_creditos = false AND limite_atingido = false 
+         ORDER BY id ASC LIMIT 1`
+      );
+
+      if (proximoUsuarioResult.rows.length > 0) {
+        await pool.query(
+          'UPDATE cadastro SET recebendo_creditos = true WHERE id = $1',
+          [proximoUsuarioResult.rows[0].id]
+        );
+      }
+    }
+
+    res.json({ 
+      success: true, 
+      message: 'Click registrado e crédito adicionado',
+      usuario_credito: usuarioCredito.email,
+      novo_saldo: novoSaldo
+    });
+
+  } catch (error) {
+    console.error('Erro no registrar-click:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// =============================
+// ⭐ SISTEMA DE AVALIAÇÕES 0-9
+// =============================
+app.post('/api/avaliacoes', async (req, res) => {
+  const { email, anuncio_id, nota } = req.body;
+
+  try {
+    // 1. REGISTRA AVALIAÇÃO
+    const result = await pool.query(
+      `INSERT INTO avaliacoes (email, anuncio_id, nota) 
+       VALUES ($1, $2, $3) RETURNING *`,
+      [email, anuncio_id, nota]
+    );
+
+    // 2. ATUALIZA ESTATÍSTICAS DO PRODUTO
+    await pool.query(`
+      INSERT INTO produtos_stats (anuncio_id, total_avaliadores, media_avaliacao) 
+      VALUES ($1, 1, $2)
+      ON CONFLICT (anuncio_id) 
+      DO UPDATE SET 
+        total_avaliadores = produtos_stats.total_avaliadores + 1,
+        media_avaliacao = (produtos_stats.media_avaliacao * produtos_stats.total_avaliadores + $2) / (produtos_stats.total_avaliadores + 1),
+        ultima_atualizacao = CURRENT_TIMESTAMP
+    `, [anuncio_id, nota]);
+
+    res.json({ 
+      success: true, 
+      avaliacao: result.rows[0],
+      message: 'Avaliação registrada com sucesso'
+    });
+
+  } catch (error) {
+    console.error('Erro na avaliação:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// =============================
+// 🔄 INICIALIZAR SISTEMA DE CRÉDITOS (PRIMEIRO USUÁRIO)
+// =============================
+app.get('/api/iniciar-creditos', async (req, res) => {
+  try {
+    // CONFIGURA PRIMEIRO USUÁRIO PARA RECEBER CRÉDITOS
+    const result = await pool.query(
+      `UPDATE cadastro SET recebendo_creditos = true 
+       WHERE id = (SELECT id FROM cadastro ORDER BY id ASC LIMIT 1)
+       RETURNING *`
+    );
+
+    res.json({ 
+      success: true, 
+      usuario_inicial: result.rows[0],
+      message: 'Sistema de créditos iniciado'
+    });
+
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+
+
+// =============================
 // 🚀 INICIAR SERVIDOR
 // =============================
 const PORT = process.env.PORT || 10000;
