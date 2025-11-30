@@ -1,140 +1,74 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Registrar - PTC System</title>
-
+<title>Registrar - CICLONE</title>
 <style>
-    body {
-        background: #e8edf2;
-        margin: 0;
-        font-family: Arial, sans-serif;
-    }
-
-    .register-box {
-        width: 340px;
-        margin: 60px auto;
-        background: #fff;
-        padding: 25px;
-        border-radius: 8px;
-        box-shadow: 0 0 12px rgba(0,0,0,0.15);
-    }
-
-    h2 {
-        text-align: center;
-        margin-bottom: 25px;
-    }
-
-    input {
-        width: 100%;
-        padding: 12px;
-        margin: 8px 0;
-        border: 1px solid #b8c2cc;
-        border-radius: 5px;
-        font-size: 15px;
-    }
-
-    button {
-        width: 100%;
-        background: #198754;
-        color: white;
-        padding: 12px;
-        border: none;
-        border-radius: 5px;
-        font-size: 16px;
-        cursor: pointer;
-        margin-top: 10px;
-    }
-
-    button:hover {
-        background: #157347;
-    }
-
-    .link {
-        text-align: center;
-        margin-top: 12px;
-        font-size: 14px;
-    }
-
-    .link a {
-        color: #0d6efd;
-        text-decoration: none;
-        font-weight: bold;
-    }
+    body { background: #e8edf2; margin: 0; font-family: Arial, sans-serif; }
+    .register-box { width: 340px; margin: 60px auto; background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 0 12px rgba(0,0,0,0.15); }
+    h2 { text-align: center; margin-bottom: 25px; }
+    input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #b8c2cc; border-radius: 5px; font-size: 15px; }
+    button { width: 100%; background: #198754; color: white; padding: 12px; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; margin-top: 10px; }
+    button:hover { background: #157347; }
+    .link { text-align: center; margin-top: 12px; font-size: 14px; }
+    .link a { color: #0d6efd; text-decoration: none; font-weight: bold; }
 </style>
-
 </head>
 <body>
 
 <div class="register-box">
-    <h2>Criar Conta</h2>
+    <h2>Criar Conta CICLONE</h2>
 
     <input type="text" id="nome" placeholder="Seu nome">
     <input type="email" id="email" placeholder="Seu e-mail">
     <input type="password" id="senha" placeholder="Crie uma senha">
-    <input type="password" id="confirmar" placeholder="Confirme a senha">
+    <input type="text" id="chavepix" placeholder="Sua chave PIX">
+    <input type="text" id="telefone" placeholder="Seu telefone">
+    <input type="text" id="avatar" placeholder="URL do seu avatar">
 
-    <button onclick="register()">Registrar</button>
+    <button onclick="fazerRegistro()">Registrar</button>
 
     <div class="link">
-      CAD  <a href="register-botton.html">CAD</a>
-        Já possui conta? <a href="login-botton.html">Login</a>
+        Já possui conta? <a href="login-top.html">Login</a>
     </div>
     
-     <p>Tu pode ganhar R$ 1.000,00 ou mais </p>
-     <p>Pagamos R$ 0,0001 por click</p>
-     <p>direto na tua conta pix </p>
-     <p>TikTok Kway tambem pagam valor igual</p>
-    
-     <p><a  href="forum.html"  >Siga o FORUM para ver depoimentos</a> </p>
-     <p>Clickers que ja receberam no CICLONE</p>
-    <p>CICLONE e totalmente made in Brasil </p>
-    
-     <p>Comeca ja a clicar , montar a tua renda </p>
-     <p>renda extra , enquanto avaliar produtos </p>
-     <p>Ganha acima de R$ 1.000,00  </p>
-    
-    
-    
+    <p>Ganhe R$ 1.000,00 ou mais</p>
+    <p>R$ 0,0001 por click direto no PIX</p>
 </div>
 
 <script>
-function register() {
-    let nome = document.getElementById("nome").value.trim();
-    let email = document.getElementById("email").value.trim();
-    let senha = document.getElementById("senha").value.trim();
-    let confirmar = document.getElementById("confirmar").value.trim();
+async function fazerRegistro() {
+    const nome = document.getElementById('nome').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const senha = document.getElementById('senha').value.trim();
+    const chavepix = document.getElementById('chavepix').value.trim();
+    const telefone = document.getElementById('telefone').value.trim();
+    const avatar = document.getElementById('avatar').value.trim();
 
-    if (!nome || !email || !senha || !confirmar) {
-        alert("Preencha todos os campos!");
+    if (!nome || !email || !senha || !chavepix || !telefone) {
+        alert('Preencha todos os campos!');
         return;
     }
 
-    if (senha !== confirmar) {
-        alert("As senhas não coincidem!");
-        return;
+    try {
+        const resposta = await fetch('https://ciclone-backend.onrender.com/api/cadastro', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nome, email, senha, chavepix, telefone, avatar })
+        });
+
+        const dados = await resposta.json();
+
+        if (dados.success) {
+            alert('Conta criada com sucesso!');
+            window.location.href = 'login-top.html';
+        } else {
+            alert('Erro: ' + dados.error);
+        }
+    } catch (erro) {
+        alert('Erro de conexão: ' + erro.message);
     }
-
-    let users = JSON.parse(localStorage.getItem("users")) || [];
-
-    if (users.some(u => u.email === email)) {
-        alert("Este e-mail já está cadastrado!");
-        return;
-    }
-
-    users.push({
-        nome: nome,
-        email: email,
-        senha: senha,
-        saldo: 0
-    });
-
-    localStorage.setItem("users", JSON.stringify(users));
-
-    alert("Conta criada com sucesso!");
-    window.location.href = "login.html";
 }
 </script>
 
