@@ -52,9 +52,13 @@ async function fazerRegistro() {
     }
 
     try {
-        const resposta = await fetch('/api/cadastro', { // rota relativa
+        // ✅ URL CORRIGIDA - usando SEU backend real
+        const resposta = await fetch('https://ciclone-62mq.onrender.com/api/cadastro', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
             body: JSON.stringify({ 
                 nome, 
                 email, 
@@ -68,15 +72,21 @@ async function fazerRegistro() {
             })
         });
 
+        // ✅ Verifica se a resposta HTTP é OK
+        if (!resposta.ok) {
+            throw new Error(`Erro do servidor: ${resposta.status}`);
+        }
+
         const dados = await resposta.json();
 
         if (dados.success) {
             alert('Conta criada com sucesso!');
             window.location.href = 'login-top.html';
         } else {
-            alert('Erro: ' + dados.error);
+            alert('Erro: ' + (dados.error || 'Erro desconhecido'));
         }
     } catch (erro) {
+        console.error('Erro completo:', erro);
         alert('Erro de conexão: ' + erro.message);
     }
 }
