@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel - CICLONE</title>
+<style>
+    body { margin: 0; background: #eef2f5; font-family: Arial, sans-serif; }
+    .header { background: #0066cc; color: white; padding: 15px; text-align: center; position: fixed; top: 0; left: 0; width: 100%; z-index: 20; font-size: 19px; font-weight: bold; }
+    .menu { margin-top: 70px; display: flex; justify-content: space-around; background: #fff; padding: 10px 0; border-bottom: 1px solid #ccc; }
+    .menu a { text-decoration: none; color: #0066cc; font-weight: bold; font-size: 15px; }
+    .saldo-info { background: #198754; color: white; padding: 15px; margin: 10px 20px; border-radius: 8px; text-align: center; font-size: 18px; font-weight: bold; }
+    .user-info { background: white; margin: 10px 20px; padding: 15px; border-radius: 8px; box-shadow: 0 0 8px rgba(0,0,0,0.15); }
+    .info-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; }
+    .info-item:last-child { border-bottom: none; }
+    .info-label { font-weight: bold; color: #555; }
+    .info-value { color: #333; }
+    .grid { padding: 20px; display: grid; gap: 15px; grid-template-columns: repeat(2, 1fr); }
+    .box { background: white; padding: 25px 10px; border-radius: 8px; text-align: center; font-size: 17px; font-weight: bold; color: #333; box-shadow: 0 0 8px rgba(0,0,0,0.15); cursor: pointer; transition: 0.2s; }
+    .box:hover { transform: scale(1.06); box-shadow: 0 0 12px rgba(0,0,0,0.25); }
+    .stats-box { background: white; margin: 10px 20px; padding: 15px; border-radius: 8px; box-shadow: 0 0 8px rgba(0,0,0,0.15); }
+    .stats-title { font-weight: bold; color: #0066cc; margin-bottom: 10px; }
+</style>
+</head>
+<body onload="carregarDadosUsuario()">
+
+<div class="header">Painel CICLONE</div>
+
+<div class="menu">
+    <a href="dashboard.html">Minha Conta</a>
+    <a href="viewads-top.html">Ganhe Dinheiro</a>
+    <a href="index.html" onclick="logout()">Sair</a>
+</div>
+
+<div class="saldo-info" id="saldoInfo">Carregando saldo...</div>
+
+<div class="user-info">
+    <div class="info-item">
+        <span class="info-label">ID:</span>
+        <span class="info-value" id="userId">-</span>
+    </div>
+    <div class="info-item">
+        <span class="info-label">Email:</span>
+        <span class="info-value" id="userEmail">-</span>
+    </div>
+    <div class="info-item">
+        <span class="info-label">Nome:</span>
+        <span class="info-value" id="userNome">-</span>
+    </div>
+    <div class="info-item">
+        <span class="info-label">Chave PIX:</span>
+        <span class="info-value" id="userPix">-</span>
+    </div>
+    <div class="info-item">
+        <span class="info-label">Telefone:</span>
+        <span class="info-value" id="userTelefone">-</span>
+    </div>
+    <div class="info-item">
+        <span class="info-label">Data de Cadastro:</span>
+        <span class="info-value" id="userDataCadastro">-</span>
+    </div>
+</div>
+
+<div class="stats-box">
+    <div class="stats-title">📊 ESTATÍSTICAS DE CLICKS</div>
+    <div class="info-item">
+        <span class="info-label">Total de Cliques:</span>
+        <span class="info-value" id="totalClicks">0</span>
+    </div>
+    <div class="info-item">
+        <span class="info-label">Cliques Hoje:</span>
+        <span class="info-value" id="clicksHoje">0</span>
+    </div>
+    <div class="info-item">
+        <span class="info-label">Último Click:</span>
+        <span class="info-value" id="ultimoClick">Nunca</span>
+    </div>
+</div>
+
+<div class="stats-box">
+    <div class="stats-title">💰 SISTEMA DE CRÉDITOS</div>
+    <div class="info-item">
+        <span class="info-label">Recebendo Créditos:</span>
+        <span class="info-value" id="recebendoCreditos">Não</span>
+    </div>
+    <div class="info-item">
+        <span class="info-label">Limite Atingido:</span>
+        <span class="info-value" id="limiteAtingido">Não</span>
+    </div>
+    <div class="info-item">
+        <span class="info-label">Saldo para Retirada:</span>
+        <span class="info-value" id="saldoRetirada">R$ 0,00</span>
+    </div>
+</div>
+
+<div class="grid">
+    <div class="box" onclick="irParaAnuncios()">Ver Anúncios</div>
+    <div class="box" onclick="comprarClickers()">Comprar Clickers</div>
+    <div class="box" onclick="meusClicks()">Meus Clicks</div>
+    <div class="box" onclick="sacarDinheiro()">Sacar Dinheiro</div>
+    <div class="box" onclick="fazerUpgrade()">Fazer Upgrade</div>
+    <div class="box" onclick="verExtrato()">Ver Extrato</div>
+</div>
+
+<script>
+async function carregarDadosUsuario() {
+    const user = JSON.parse(localStorage.getItem('user'));
+    
+    if (!user || !user.id) {
+        window.location.href = 'login-top.html';
+        return;
+    }
+
+    try {
+        // BUSCA DADOS DIRETO DAS TABELAS
+        const resposta = await fetch(`https://ciclone-62mq.onrender.com/api/dashboard/${user.id}`);
+        const dados = await resposta.json();
+        
+        if (dados.success) {
+            // DADOS DA TABELA CADASTRO
+            const userData = dados.user;
+            // DADOS DA TABELA CLICKS
+            const clicksData = dados.clicks;
+            
+            // PREENCHE DADOS DO USUÁRIO
+            document.getElementById('saldoInfo').innerHTML = `Saldo Disponível: R$ ${parseFloat(userData.saldo_redisponivel || 0).toFixed(2)}`;
+            document.getElementById('userId').textContent = userData.id;
+            document.getElementById('userEmail').textContent = userData.email;
+            document.getElementById('userNome').textContent = userData.nome || 'Não informado';
+            document.getElementById('userPix').textContent = userData.chavepix || 'Não cadastrada';
+            document.getElementById('userTelefone').textContent = userData.telefone || 'Não cadastrado';
+            document.getElementById('userDataCadastro').textContent = new Date(userData.data_criacao).toLocaleDateString();
+            
+            // PREENCHE SISTEMA DE CRÉDITOS
+            document.getElementById('recebendoCreditos').textContent = userData.recebendo_creditos ? 'Sim' : 'Não';
+            document.getElementById('limiteAtingido').textContent = userData.limite_atingido ? 'Sim' : 'Não';
+            document.getElementById('saldoRetirada').textContent = `R$ ${parseFloat(userData.saldo_redisponivel || 0).toFixed(2)}`;
+            
+            // PREENCHE ESTATÍSTICAS DE CLICKS
+            document.getElementById('totalClicks').textContent = clicksData.total_clicks || 0;
+            document.getElementById('clicksHoje').textContent = clicksData.clicks_hoje || 0;
+            
+            if (clicksData.data_ultimo_click) {
+                const data = new Date(clicksData.data_ultimo_click);
+                document.getElementById('ultimoClick').textContent = data.toLocaleString();
+            }
+        } else {
+            alert('Erro: ' + dados.error);
+        }
+    } catch (erro) {
+        console.log('Erro ao carregar dados:', erro);
+        alert('Erro de conexão com o servidor');
+    }
+}
+
+function irParaAnuncios() {
+    window.location.href = 'viewads-top.html';
+}
+
+function comprarClickers() {
+    alert('Redirecionando para compra de clickers...');
+}
+
+function meusClicks() {
+    alert('Abrindo histórico de clicks...');
+}
+
+function sacarDinheiro() {
+    alert('Abrindo sistema de saques...');
+}
+
+function fazerUpgrade() {
+    alert('Abrindo upgrade de conta...');
+}
+
+function verExtrato() {
+    alert('Abrindo extrato...');
+}
+
+function logout() {
+    localStorage.removeItem('user');
+    window.location.href = 'index.html';
+}
+</script>
+
+</body>
+</html>
