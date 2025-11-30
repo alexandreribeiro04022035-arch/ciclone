@@ -37,7 +37,47 @@
     <p>R$ 0,0001 por click direto no PIX</p>
 </div>
 
+
 <script>
+async function fazerRegistro() {
+    const nome = document.getElementById('nome').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const senha = document.getElementById('senha').value.trim();
+    const chavepix = document.getElementById('chavepix').value.trim();
+    const telefone = document.getElementById('telefone').value.trim();
+    const avatar = document.getElementById('avatar').value.trim();
+
+    if (!nome || !email || !senha || !chavepix || !telefone) {
+        alert('Preencha todos os campos!');
+        return;
+    }
+
+    try {
+        const resposta = await fetch('https://ciclone-62mq.onrender.com/api/cadastro', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nome, email, senha, chavepix, telefone, avatar })
+        });
+
+        const dados = await resposta.json();
+
+        if (dados.success) {
+            alert('Conta criada com sucesso!');
+            window.location.href = 'login-top.html';
+        } else {
+            alert('Erro: ' + dados.error);
+        }
+    } catch (erro) {
+        alert('Erro de conexão: ' + erro.message);
+    }
+}
+</script>
+
+
+
+    
+<!---------
+    script>
 async function fazerRegistro() {
     const nome = document.getElementById('nome').value.trim();
     const email = document.getElementById('email').value.trim();
@@ -70,7 +110,8 @@ async function fazerRegistro() {
         alert('Erro de conexão: ' + erro.message);
     }
 }
-</script>
+</script
+    --------->
 
 </body>
 </html>
