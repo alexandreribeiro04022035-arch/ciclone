@@ -157,7 +157,25 @@ app.get('/api/creditos/atual', async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000;
+app.listen(PORT, () => {
+  console.log(`✅ CICLONE Backend rodando na porta ${PORT}`);
+});
+
+
+
+
+/*   const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`CICLONE Backend running on port ${PORT}`);
-});
+});    */
+
+
+
+
+
+
+
+
+
+
