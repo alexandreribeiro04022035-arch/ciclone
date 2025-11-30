@@ -1,1 +1,48 @@
-Ola Mundo 
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CICLONE PTC</title>
+
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+        background: #f2f2f2;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    iframe {
+        width: 100%;
+        border: none;
+    }
+
+    #headerFrame {
+        height: 90px;
+        flex-shrink: 0;
+    }
+
+    #footerFrame {
+        height: 70px;
+        flex-shrink: 0;
+    }
+
+    #middleFrame {
+        flex-grow: 1;
+    }
+</style>
+</head>
+<body>
+
+<iframe id="headerFrame" src="header-neobux.html"></iframe>
+
+<iframe id="middleFrame" src="body.html"></iframe>
+
+<iframe id="footerFrame" src="footer-black.html"></iframe>
+
+</body>
+</html>
