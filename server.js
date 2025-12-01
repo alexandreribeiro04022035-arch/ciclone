@@ -508,7 +508,7 @@ app.post('/api/produtos', async (req, res) => {
 // =============================
 // 📊 ROTA ESTATÍSTICAS PÚBLICAS
 // =============================
-app.get('/api/estatisticas', async (req, res) => {
+/* app.get('/api/estatisticas', async (req, res) => {
   try {
     // 1. TOTAL DE USUÁRIOS
     const totalUsuariosResult = await pool.query('SELECT COUNT(*) FROM cadastro');
@@ -597,9 +597,11 @@ app.get('/api/estatisticas', async (req, res) => {
     res.status(500).json({ success: false, error: error.message });
   }
 });
+*/
+
 
 // ROTA DE ESTATÍSTICAS (adicione no server.js)
-app.get('/api/estatisticas', async (req, res) => {
+/*. app.get('/api/estatisticas', async (req, res) => {
   try {
     // 1. Total de usuários
     const usuarios = await pool.query('SELECT COUNT(*) as total FROM cadastro');
@@ -634,9 +636,57 @@ app.get('/api/estatisticas', async (req, res) => {
   } catch (error) {
     res.json({ success: false, error: error.message });
   }
+});  */
+
+// ROTA ÚNICA DE ESTATÍSTICAS - COLOCAR NO FINAL DO SEU SERVER.JS
+app.get('/api/estatisticas', async (req, res) => {
+  try {
+    // 1. TOTAL DE USUÁRIOS
+    const usuarios = await pool.query('SELECT COUNT(*) as total FROM cadastro');
+    
+    // 2. TOTAL DE CLICKS
+    const clicks = await pool.query('SELECT COALESCE(SUM(total_clicks), 0) as total FROM clicks');
+    
+    // 3. TOTAL DE ANÚNCIOS (sem filtro)
+    const anuncios = await pool.query('SELECT COUNT(*) as total FROM anuncios');
+    
+    // 4. TOTAL DE PRODUTOS (sem filtro)
+    const produtos = await pool.query('SELECT COUNT(*) as total FROM produtos');
+    
+    // 5. USUÁRIO COM MAIOR SALDO
+    const maiorSaldo = await pool.query('SELECT nome, saldo_redisponivel as saldo FROM cadastro ORDER BY saldo_redisponivel DESC LIMIT 1');
+    
+    // 6. USUÁRIO COM MAIS CLICKS
+    const maisClicks = await pool.query(`
+      SELECT cad.nome, c.total_clicks 
+      FROM clicks c 
+      JOIN cadastro cad ON c.email = cad.email 
+      ORDER BY c.total_clicks DESC LIMIT 1
+    `);
+
+    res.json({
+      success: true,
+      total_usuarios: parseInt(usuarios.rows[0].total),
+      total_clicks: parseInt(clicks.rows[0].total),
+      total_anuncios: parseInt(anuncios.rows[0].total),
+      total_produtos: parseInt(produtos.rows[0].total),
+      maior_saldo: maiorSaldo.rows[0] || { nome: null, saldo: 0 },
+      mais_clicks: maisClicks.rows[0] || { nome: null, total_clicks: 0 }
+    });
+    
+  } catch (error) {
+    res.json({ 
+      success: false, 
+      error: error.message,
+      total_usuarios: 0,
+      total_clicks: 0,
+      total_anuncios: 0,
+      total_produtos: 0,
+      maior_saldo: { nome: null, saldo: 0 },
+      mais_clicks: { nome: null, total_clicks: 0 }
+    });
+  }
 });
-
-
 
 
 
