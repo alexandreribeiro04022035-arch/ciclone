@@ -205,6 +205,29 @@ app.get('/api/anuncios', async (req, res) => {
 });
 
 // =============================
+// 📢 ROTA BUSCAR ANÚNCIO POR ID
+// =============================
+app.get('/api/anuncios/:id', async (req, res) => {
+  const anuncioId = req.params.id;
+
+  try {
+    const result = await pool.query('SELECT * FROM anuncios WHERE id = $1 AND ativo = true', [anuncioId]);
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ success: false, error: 'Anúncio não encontrado' });
+    }
+
+    res.json({ success: true, anuncio: result.rows[0] });
+
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+
+
+
+// =============================
 // 🎯 ROTA HEALTH CHECK
 // =============================
 app.get('/api/health', async (req, res) => {
