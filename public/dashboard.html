@@ -96,10 +96,10 @@
 <div class="grid">
     <div class="box" onclick="irParaAnuncios()">Ver Anúncios</div>
     <div class="box" onclick="comprarClickers()">Comprar Clickers</div>
-    <div class="box" onclick="meusClicks()">Meus Clicks</div>
+    
     <div class="box" onclick="sacarDinheiro()">Sacar Dinheiro</div>
     <div class="box" onclick="fazerUpgrade()">Fazer Upgrade</div>
-    <div class="box" onclick="verExtrato()">Ver Extrato</div>
+    
 </div>
 
 <script>
@@ -154,28 +154,26 @@ async function carregarDadosUsuario() {
 }
 
 function irParaAnuncios() {
-    window.location.href = 'viewads-top.html';
+    window.location.href = 'viewads-botton.html';
 }
 
 function comprarClickers() {
+   window.location.href = '#';
     alert('Redirecionando para compra de clickers...');
 }
 
-function meusClicks() {
-    alert('Abrindo histórico de clicks...');
-}
+
 
 function sacarDinheiro() {
+       window.location.href = '#';
     alert('Abrindo sistema de saques...');
 }
 
 function fazerUpgrade() {
+    window.location.href = '#';
     alert('Abrindo upgrade de conta...');
 }
 
-function verExtrato() {
-    alert('Abrindo extrato...');
-}
 
 function logout() {
     localStorage.removeItem('user');
