@@ -352,6 +352,141 @@ app.post('/api/anuncios', async (req, res) => {
 });
 
 
+// =============================
+// 📦 ROTAS PARA PRODUTOS
+// =============================
+
+// BUSCAR TODOS OS PRODUTOS ATIVOS
+app.get('/api/produtos', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM produtos WHERE ativo = true');
+    res.json({ success: true, produtos: result.rows });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// BUSCAR PRODUTO POR ID
+app.get('/api/produtos/:id', async (req, res) => {
+  const productId = req.params.id;
+
+  try {
+    const result = await pool.query('SELECT * FROM produtos WHERE id = $1 AND ativo = true', [productId]);
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ success: false, error: 'Produto não encontrado' });
+    }
+
+    res.json({ success: true, produto: result.rows[0] });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// AVALIAR PRODUTO E DAR CRÉDITO
+app.post('/api/avaliar-produto', async (req, res) => {
+  const { email, produto_id, nota } = req.body;
+
+  try {
+    // 1. ENCONTRA O USUÁRIO COM MENOR ID QUE RECEBE CRÉDITOS
+    const usuarioCreditoResult = await pool.query(
+      `SELECT * FROM cadastro 
+       WHERE recebendo_creditos = true AND limite_atingido = false 
+       ORDER BY id ASC LIMIT 1`
+    );
+
+    if (usuarioCreditoResult.rows.length === 0) {
+      return res.json({ success: false, error: 'Nenhum usuário recebendo créditos no momento' });
+    }
+
+    const usuarioCredito = usuarioCreditoResult.rows[0];
+
+    // 2. REGISTRA AVALIAÇÃO DO PRODUTO
+    const avaliacaoResult = await pool.query(
+      `INSERT INTO avaliacoes (email, produto_id, nota) 
+       VALUES ($1, $2, $3) RETURNING *`,
+      [email, produto_id, nota]
+    );
+
+    // 3. ATUALIZA ESTATÍSTICAS DO PRODUTO
+    await pool.query(`
+      INSERT INTO produtos_stats (produto_id, total_avaliadores, media_avaliacao) 
+      VALUES ($1, 1, $2)
+      ON CONFLICT (produto_id) 
+      DO UPDATE SET 
+        total_avaliadores = produtos_stats.total_avaliadores + 1,
+        media_avaliacao = (produtos_stats.media_avaliacao * produtos_stats.total_avaliadores + $2) / (produtos_stats.total_avaliadores + 1),
+        ultima_atualizacao = CURRENT_TIMESTAMP
+    `, [produto_id, nota]);
+
+    // 4. ADICIONA R$ 0,0001 AO SALDO DO USUÁRIO COM MENOR ID
+    const novoSaldo = parseFloat(usuarioCredito.saldo_redisponivel) + 0.0001;
+    
+    await pool.query(
+      'UPDATE cadastro SET saldo_redisponivel = $1 WHERE id = $2',
+      [novoSaldo, usuarioCredito.id]
+    );
+
+    // 5. VERIFICA SE ATINGIU O LIMITE DE R$ 1000,00
+    if (novoSaldo >= 1000.00) {
+      await pool.query(
+        'UPDATE cadastro SET limite_atingido = true, recebendo_creditos = false WHERE id = $1',
+        [usuarioCredito.id]
+      );
+
+      // PASSA PARA O PRÓXIMO USUÁRIO COM MENOR ID
+      const proximoUsuarioResult = await pool.query(
+        `SELECT * FROM cadastro 
+         WHERE recebendo_creditos = false AND limite_atingido = false 
+         ORDER BY id ASC LIMIT 1`
+      );
+
+      if (proximoUsuarioResult.rows.length > 0) {
+        await pool.query(
+          'UPDATE cadastro SET recebendo_creditos = true WHERE id = $1',
+          [proximoUsuarioResult.rows[0].id]
+        );
+      }
+    }
+
+    res.json({ 
+      success: true, 
+      message: 'Avaliação registrada e crédito adicionado',
+      usuario_credito: usuarioCredito.email,
+      novo_saldo: novoSaldo,
+      avaliacao: avaliacaoResult.rows[0]
+    });
+
+  } catch (error) {
+    console.error('Erro ao avaliar produto:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// CRIAR NOVO PRODUTO
+app.post('/api/produtos', async (req, res) => {
+  const { titulo, banner_url, link_produto, descricao } = req.body;
+
+  try {
+    const result = await pool.query(
+      `INSERT INTO produtos (titulo, banner_url, link_produto, descricao) 
+       VALUES ($1, $2, $3, $4) RETURNING *`,
+      [titulo, banner_url, link_produto, descricao]
+    );
+
+    res.json({ success: true, produto: result.rows[0] });
+
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+
+
+
+
+
+
 
 
 
