@@ -332,6 +332,31 @@ app.post('/api/avaliacoes', async (req, res) => {
 });
 
 // =============================
+// 📢 ROTA CRIAR ANÚNCIO
+// =============================
+app.post('/api/anuncios', async (req, res) => {
+  const { titulo, banner_url, link_anuncio, tempo_exibicao } = req.body;
+
+  try {
+    const result = await pool.query(
+      `INSERT INTO anuncios (titulo, banner_url, link_anuncio, tempo_exibicao) 
+       VALUES ($1, $2, $3, $4) RETURNING *`,
+      [titulo, banner_url, link_anuncio, tempo_exibicao || 30]
+    );
+
+    res.json({ success: true, anuncio: result.rows[0] });
+
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+
+
+
+
+
+// =============================
 // 🔄 INICIALIZAR SISTEMA DE CRÉDITOS (PRIMEIRO USUÁRIO)
 // =============================
 app.get('/api/iniciar-creditos', async (req, res) => {
