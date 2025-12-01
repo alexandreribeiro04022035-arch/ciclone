@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CICLONE</title>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: Arial, sans-serif;
+    }
+
+    body {
+        background: #0f172a;
+        color: white;
+        min-height: 100vh;
+        padding: 20px;
+    }
+
+    .topo {
+        display: flex;
+        align-items: center;
+        gap: 30px;
+        margin-bottom: 30px;
+        background: rgba(255, 255, 255, 0.05);
+        padding: 20px;
+        border-radius: 10px;
+    }
+
+    .texto {
+        flex: 2;
+    }
+
+    .texto h2 {
+        color: #3b82f6;
+        font-size: 24px;
+        margin-bottom: 10px;
+    }
+
+    .texto p {
+        color: #cbd5e1;
+        line-height: 1.5;
+    }
+
+    .imagem {
+        flex: 1;
+        text-align: center;
+    }
+
+    .imagem img {
+        width: 150px;
+        height: 150px;
+        border-radius: 10px;
+        object-fit: cover;
+        border: 3px solid #3b82f6;
+    }
+
+    .estatisticas {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+
+    .item {
+        background: rgba(255, 255, 255, 0.08);
+        padding: 20px;
+        border-radius: 8px;
+        border-left: 4px solid #3b82f6;
+    }
+
+    .nome {
+        color: #94a3b8;
+        font-size: 14px;
+        margin-bottom: 5px;
+    }
+
+    .valor {
+        color: white;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+    .fonte {
+        color: #64748b;
+        font-size: 12px;
+        margin-top: 5px;
+    }
+
+    .rodape {
+        text-align: center;
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        color: #94a3b8;
+        font-size: 14px;
+    }
+
+    .rodape a {
+        color: #3b82f6;
+        text-decoration: none;
+        margin: 0 10px;
+    }
+</style>
+</head>
+<body>
+
+<div class="topo">
+    <div class="texto">
+        <h2>PLATAFORMA PTC CICLONE</h2>
+        <p>Sistema brasileiro de anúncios pagos. Distribuição começa pelo menor ID.</p>
+        <p>Estatísticas atualizadas em tempo real.</p>
+    </div>
+    
+    <div class="imagem">
+        <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" alt="Logo">
+    </div>
+</div>
+
+<div class="estatisticas" id="estatisticas">
+    <!-- Dados serão carregados aqui -->
+</div>
+
+<div class="rodape">
+    <p>
+        <a href="index.html">Início</a> | 
+        <a href="login-top.html">Login</a> | 
+        <a href="register.html">Registrar</a>
+    </p>
+</div>
+
+<script>
+// Busca dados REAIS das tabelas
+async function buscarEstatisticas() {
+    try {
+        const resposta = await fetch('https://ciclone-62mq.onrender.com/api/estatisticas');
+        const dados = await resposta.json();
+        
+        if (dados.success) {
+            mostrarDados(dados);
+        } else {
+            mostrarDadosZerados();
+        }
+    } catch (erro) {
+        console.error('Erro:', erro);
+        mostrarDadosZerados();
+    }
+}
+
+// Formata números
+function formatarNumero(num) {
+    return num ? num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") : "0";
+}
+
+// Formata dinheiro
+function formatarDinheiro(valor) {
+    return valor ? "R$ " + parseFloat(valor).toFixed(2).replace(".", ",") : "R$ 0,00";
+}
+
+// Mostra dados REAIS
+function mostrarDados(dados) {
+    const container = document.getElementById('estatisticas');
+    
+    container.innerHTML = `
+        <div class="item">
+            <div class="nome">USUÁRIOS</div>
+            <div class="valor">${formatarNumero(dados.total_usuarios)}</div>
+            <div class="fonte">tabela cadastro</div>
+        </div>
+        
+        <div class="item">
+            <div class="nome">CLICKS</div>
+            <div class="valor">${formatarNumero(dados.total_clicks)}</div>
+            <div class="fonte">tabela clicks</div>
+        </div>
+        
+        <div class="item">
+            <div class="nome">ANÚNCIOS</div>
+            <div class="valor">${formatarNumero(dados.total_anuncios)}</div>
+            <div class="fonte">tabela anuncios</div>
+        </div>
+        
+        <div class="item">
+            <div class="nome">AVALIAÇÕES</div>
+            <div class="valor">${formatarNumero(dados.total_avaliacoes)}</div>
+            <div class="fonte">tabela avaliacoes</div>
+        </div>
+        
+        <div class="item" style="grid-column: span 2;">
+            <div class="nome">SALDO TOTAL</div>
+            <div class="valor">${formatarDinheiro(dados.saldo_total)}</div>
+            <div class="fonte">soma dos saldos da tabela cadastro</div>
+        </div>
+        
+        <div class="item" style="grid-column: span 2;">
+            <div class="nome">PRÓXIMO A RECEBER</div>
+            <div class="valor">ID ${dados.proximo_recebedor.id} (${formatarDinheiro(dados.proximo_recebedor.saldo)})</div>
+            <div class="fonte">menor ID com saldo pendente</div>
+        </div>
+    `;
+}
+
+// Mostra zeros se não tiver dados
+function mostrarDadosZerados() {
+    const container = document.getElementById('estatisticas');
+    
+    container.innerHTML = `
+        <div class="item">
+            <div class="nome">USUÁRIOS</div>
+            <div class="valor">0</div>
+            <div class="fonte">tabela cadastro</div>
+        </div>
+        
+        <div class="item">
+            <div class="nome">CLICKS</div>
+            <div class="valor">0</div>
+            <div class="fonte">tabela clicks</div>
+        </div>
+        
+        <div class="item">
+            <div class="nome">ANÚNCIOS</div>
+            <div class="valor">0</div>
+            <div class="fonte">tabela anuncios</div>
+        </div>
+        
+        <div class="item">
+            <div class="nome">AVALIAÇÕES</div>
+            <div class="valor">0</div>
+            <div class="fonte">tabela avaliacoes</div>
+        </div>
+        
+        <div class="item" style="grid-column: span 2;">
+            <div class="nome">SALDO TOTAL</div>
+            <div class="valor">R$ 0,00</div>
+            <div class="fonte">soma dos saldos da tabela cadastro</div>
+        </div>
+        
+        <div class="item" style="grid-column: span 2;">
+            <div class="nome">PRÓXIMO A RECEBER</div>
+            <div class="valor">Nenhum</div>
+            <div class="fonte">menor ID com saldo pendente</div>
+        </div>
+    `;
+}
+
+// Carrega ao abrir
+buscarEstatisticas();
+
+// Atualiza a cada 30 segundos
+setInterval(buscarEstatisticas, 30000);
+</script>
+
+</body>
+</html>
