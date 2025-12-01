@@ -482,7 +482,98 @@ app.post('/api/produtos', async (req, res) => {
 });
 
 
+// =============================
+// 📊 ROTA ESTATÍSTICAS PÚBLICAS
+// =============================
+app.get('/api/estatisticas', async (req, res) => {
+  try {
+    // 1. TOTAL DE USUÁRIOS
+    const totalUsuariosResult = await pool.query('SELECT COUNT(*) FROM cadastro');
+    const totalUsuarios = parseInt(totalUsuariosResult.rows[0].count);
 
+    // 2. USUÁRIO COM MAIOR SALDO
+    const maiorSaldoResult = await pool.query(
+      'SELECT id, nome, saldo_redisponivel FROM cadastro ORDER BY saldo_redisponivel DESC LIMIT 1'
+    );
+
+    // 3. USUÁRIO COM MAIS CLICKS
+    const maisClicksResult = await pool.query(`
+      SELECT c.email, cad.nome, c.total_clicks 
+      FROM clicks c 
+      JOIN cadastro cad ON c.email = cad.email 
+      ORDER BY c.total_clicks DESC LIMIT 1
+    `);
+
+    // 4. TOTAL DE ANÚNCIOS
+    const totalAnunciosResult = await pool.query('SELECT COUNT(*) FROM anuncios WHERE ativo = true');
+    const totalAnuncios = parseInt(totalAnunciosResult.rows[0].count);
+
+    // 5. TOTAL DE PRODUTOS
+    const totalProdutosResult = await pool.query('SELECT COUNT(*) FROM produtos WHERE ativo = true');
+    const totalProdutos = parseInt(totalProdutosResult.rows[0].count);
+
+    // 6. PRODUTO COM MELHOR NOTA
+    const produtoMelhorNotaResult = await pool.query(`
+      SELECT p.id, p.titulo, ps.media_avaliacao as nota
+      FROM produtos p
+      LEFT JOIN produtos_stats ps ON p.id = ps.produto_id
+      WHERE p.ativo = true AND ps.media_avaliacao IS NOT NULL
+      ORDER BY ps.media_avaliacao DESC LIMIT 1
+    `);
+
+    // 7. PRODUTO COM PIOR NOTA
+    const produtoPiorNotaResult = await pool.query(`
+      SELECT p.id, p.titulo, ps.media_avaliacao as nota
+      FROM produtos p
+      LEFT JOIN produtos_stats ps ON p.id = ps.produto_id
+      WHERE p.ativo = true AND ps.media_avaliacao IS NOT NULL
+      ORDER BY ps.media_avaliacao ASC LIMIT 1
+    `);
+
+    // 8. PRÓXIMO USUÁRIO A RECEBER CRÉDITOS
+    const proximoRecebedorResult = await pool.query(`
+      SELECT id, nome FROM cadastro 
+      WHERE recebendo_creditos = true AND limite_atingido = false 
+      ORDER BY id ASC LIMIT 1
+    `);
+
+    // 9. TOTAL DE CLICKS
+    const totalClicksResult = await pool.query('SELECT SUM(total_clicks) FROM clicks');
+    const totalClicks = parseInt(totalClicksResult.rows[0].sum || 0);
+
+    // 10. TOTAL DISTRIBUÍDO
+    const totalDistribuidoResult = await pool.query('SELECT SUM(saldo_redisponivel) FROM cadastro');
+    const totalDistribuido = parseFloat(totalDistribuidoResult.rows[0].sum || 0);
+
+    // 11. TOTAL AVALIAÇÕES
+    const totalAvaliacoesResult = await pool.query('SELECT COUNT(*) FROM avaliacoes');
+    const totalAvaliacoes = parseInt(totalAvaliacoesResult.rows[0].count || 0);
+
+    res.json({
+      success: true,
+      total_usuarios: totalUsuarios,
+      maior_saldo: maiorSaldoResult.rows[0] || { nome: 'Nenhum', saldo: 0 },
+      mais_clicks: maisClicksResult.rows[0] || { nome: 'Nenhum', clicks: 0 },
+      total_anuncios: totalAnuncios,
+      anuncios_ativos: totalAnuncios,
+      total_produtos: totalProdutos,
+      produto_melhor_nota: produtoMelhorNotaResult.rows[0] || { titulo: 'Nenhum', nota: 0 },
+      produto_pior_nota: produtoPiorNotaResult.rows[0] || { titulo: 'Nenhum', nota: 0 },
+      proximo_recebedor: proximoRecebedorResult.rows[0] || { id: 0, nome: 'Nenhum' },
+      total_clicks: totalClicks,
+      clicks_hoje: Math.floor(totalClicks * 0.1), // Simulação
+      clicks_hora: Math.floor(totalClicks * 0.01), // Simulação
+      total_distribuido: totalDistribuido,
+      total_avaliacoes: totalAvaliacoes,
+      media_avaliacoes: 7.2, // Simulação
+      avaliacoes_hoje: Math.floor(totalAvaliacoes * 0.05) // Simulação
+    });
+
+  } catch (error) {
+    console.error('Erro nas estatísticas:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
 
 
 
