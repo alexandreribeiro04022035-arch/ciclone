@@ -27,6 +27,28 @@ body {
     font-weight: bold;
     color: #0099ff;
 }
+
+/* BARRA DESLIZANTE */
+.marquee-box {
+    background: #012d5c;
+    color: white;
+    padding: 6px 0;
+    overflow: hidden;
+    white-space: nowrap;
+    font-size: 14px;
+}
+
+.marquee {
+    display: inline-block;
+    animation: slide 20s linear infinite;
+}
+
+@keyframes slide {
+    0% { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+}
+
+    
 </style>
 </head>
 <body>
@@ -41,6 +63,15 @@ body {
     <a href="header-probux.html">MAIS</a>
     
 </div>
+
+<!-- BARRA DESLIZANTE -->
+<div class="marquee-box">
+    <div class="marquee">
+        🔔 @R 2025 last version, Alexandre Ribeiro André Bonotto 
+        GitRenderVercelSupaNeon  ChatGPT5 DeepSeek Gemini 🔔
+    </div>
+</div>
+    
 
 </body>
 </html>
