@@ -8,27 +8,35 @@ body {
     background: #ffffff;
     padding: 10px 20px;
     border-bottom: 4px solid #ffcc00;
+    font-family: Arial, sans-serif;
+}
+
+/* CONTAINER DO LOGO E MENU */
+.header-top {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-family: Arial, sans-serif;
+    margin-bottom: 0;
 }
+
 .menu a {
     margin-left: 25px;
     text-decoration: none;
     color: #444;
     font-weight: bold;
 }
+
 .menu a:hover {
     color: #000;
 }
+
 .logo {
     font-size: 26px;
     font-weight: bold;
     color: #0099ff;
 }
 
-/* BARRA DESLIZANTE */
+/* BARRA DESLIZANTE (AGORA ABAIXO) */
 .marquee-box {
     background: #012d5c;
     color: white;
@@ -36,6 +44,8 @@ body {
     overflow: hidden;
     white-space: nowrap;
     font-size: 14px;
+    width: 100%;
+    margin-top: 10px;
 }
 
 .marquee {
@@ -47,31 +57,27 @@ body {
     0% { transform: translateX(100%); }
     100% { transform: translateX(-100%); }
 }
-
-    
 </style>
 </head>
 <body>
 
-<div class="logo">NeoBux</div>
-
-<div class="menu">
-    <a href="estatisticas.html"  target="_top"   >View Ads</a>
-    
-    <a href="login-top.html"  target="_top" >Account</a>
-    
-    <a href="header-probux.html">MAIS</a>
-    
+<!-- PRIMEIRA LINHA: LOGO E MENU -->
+<div class="header-top">
+    <div class="logo">NeoBux</div>
+    <div class="menu">
+        <a href="estatisticas.html" target="_top">View Ads</a>
+        <a href="login-top.html" target="_top">Account</a>
+        <a href="header-probux.html">MAIS</a>
+    </div>
 </div>
 
-<!-- BARRA DESLIZANTE -->
+<!-- SEGUNDA LINHA: BARRA DESLIZANTE (AGORA NO LUGAR CERTO) -->
 <div class="marquee-box">
     <div class="marquee">
         🔔 @R 2025 last version, Alexandre Ribeiro André Bonotto 
         GitRenderVercelSupaNeon  ChatGPT5 DeepSeek Gemini 🔔
     </div>
 </div>
-    
 
 </body>
 </html>
