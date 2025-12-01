@@ -107,7 +107,54 @@
 </div>
 
 <script>
+
 async function carregarDadosUsuario() {
+    const user = JSON.parse(localStorage.getItem('user'));
+    
+    if (!user || !user.id) {
+        alert("Você precisa estar logado!");
+        window.location.href = "login-top.html";
+        return;
+    }
+
+    console.log('Buscando dados para user_id:', user.id);
+
+    try {
+        const resposta = await fetch(`https://ciclone-62mq.onrender.com/api/dashboard/${user.id}`);
+        const dados = await resposta.json();
+        
+        console.log('Resposta da API:', dados);
+
+        if (dados.success) {
+            const userData = dados.user;
+            
+            // PREENCHE OS DADOS NA TELA
+            document.getElementById('userInfo').textContent = 
+                `Bem-vindo, ${userData.nome}! | Saldo: R$ ${parseFloat(userData.saldo_redisponivel || 0).toFixed(2)}`;
+            
+            document.getElementById('userEmail').textContent = userData.email;
+            document.getElementById('userSaldo').textContent = `R$ ${parseFloat(userData.saldo_redisponivel || 0).toFixed(2)}`;
+            
+            // STATUS
+            let status = '✔️ Ativo';
+            if (userData.limite_atingido) status = '⏸️ Limite Atingido';
+            document.getElementById('userStatus').textContent = status;
+
+        } else {
+            document.getElementById('userInfo').textContent = 'Erro: ' + dados.error;
+        }
+    } catch (erro) {
+        console.log('Erro completo:', erro);
+        document.getElementById('userInfo').textContent = 'Erro de conexão: ' + erro.message;
+    }
+}
+
+
+
+
+
+    
+/*  async function carregarDadosUsuario() {
     const user = JSON.parse(localStorage.getItem('user'));
     
     if (!user || !user.id) {
@@ -143,7 +190,7 @@ async function carregarDadosUsuario() {
         console.log('Erro ao carregar dados:', erro);
         document.getElementById('userInfo').textContent = 'Erro ao carregar dados';
     }
-}
+}   */
 
 function logout() {
     localStorage.removeItem('user');
