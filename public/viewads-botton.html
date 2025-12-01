@@ -22,6 +22,15 @@
         font-weight: bold;
     }
 
+    .user-info {
+        background: #198754;
+        color: white;
+        padding: 10px;
+        text-align: center;
+        font-size: 16px;
+        font-weight: bold;
+    }
+
     .container {
         max-width: 900px;
         margin: 30px auto;
@@ -79,21 +88,39 @@
 </style>
 
 </head>
-<body onload="loadAds();">
+<body onload="loadUserAndAds();">
 
 <header>View Ads</header>
 
+<div class="user-info" id="userInfo">Carregando usuário...</div>
+
 <div class="container">
     <h2>Anúncios Disponíveis</h2>
-<a href="dashboard-botton.html">VOLTAR</a>
+    <a href="dashboard-botton.html">VOLTAR</a>
+    
     <div class="ad-grid" id="adsList"></div>
 </div>
 
 <script>
+function loadUserAndAds() {
+    // CARREGA USUÁRIO DA SESSÃO
+    const user = JSON.parse(localStorage.getItem('user'));
+    
+    if (!user) {
+        window.location.href = 'login-top.html';
+        return;
+    }
+
+    // MOSTRA INFO DO USUÁRIO
+    document.getElementById('userInfo').textContent = 
+        `Usuário: ${user.nome} | Saldo: R$ ${parseFloat(user.saldo_redisponivel || 0).toFixed(2)}`;
+
+    // CARREGA ANÚNCIOS
+    loadAds();
+}
 
 function loadAds() {
-
-    // Anúncios VISÍVEIS e clicáveis logo ao entrar na página
+    // Anúncios VISÍVEIS e clicáveis
     const ads = [
         { id: 1, title: "FuseBux", desc: "Think Different... Think BIG!", time: "60 sec" },
         { id: 2, title: "eToro", desc: "Earn money fast", time: "30 sec" },
@@ -121,6 +148,7 @@ function loadAds() {
 }
 
 function openAd(id) {
+    // VAI PARA VIEWAD-BOTTON.HTML COM ID DO ANÚNCIO
     window.location.href = `viewad-botton.html?id=${id}`;
 }
 </script>
