@@ -13,25 +13,61 @@ body {
     justify-content: space-between;
     align-items: center;
 }
+.logo-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.baleia-logo {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #1a73e8, #4fc3f7);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    cursor: pointer;
+    transition: transform 0.3s;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+.baleia-logo:hover {
+    transform: scale(1.1);
+}
+.baleia-logo::after {
+    content: "🐋";
+}
+.marca-texto {
+    font-size: 24px;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+}
 .menu a {
     margin-left: 20px;
     text-decoration: none;
     color: #fff;
     font-weight: bold;
+    padding: 8px 12px;
+    border-radius: 5px;
+    transition: background 0.3s;
 }
 .menu a:hover {
-    text-decoration: underline;
+    background: rgba(255, 255, 255, 0.2);
+    text-decoration: none;
 }
 </style>
 </head>
 <body>
-    <a href="urldologo" ><img src="#" >logo</a>
-<div style="font-size:24px; font-weight:bold;">ProBux</div>
+
+<div class="logo-container">
+    <a href="https://chat.deepseek.com" target="_blank" class="baleia-logo" title="DeepSeek AI Assistant"></a>
+    <div class="marca-texto">DeepSeek</div>
+</div>
 
 <div class="menu">
-   
-    <a href="register.html"  target="_top">Cadastro</a>
-    <a href="footer-black.html" >MAIS</a>
+    <a href="register.html" target="_top">Cadastro</a>
+    <a href="footer-black.html">MAIS</a>
 </div>
 
 </body>
