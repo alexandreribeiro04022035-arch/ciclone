@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - ProBux</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f6fa;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background: #0077ff;
+            color: white;
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        header img {
+            height: 40px;
+        }
+        nav a {
+            color: white;
+            margin-left: 18px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .container {
+            max-width: 900px;
+            margin: 30px auto;
+            background: white;
+            padding: 20px 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .container h2 {
+            margin-top: 0;
+        }
+        .btn {
+            display: inline-block;
+            margin: 10px 10px 10px 0;
+            background: #0077ff;
+            color: white;
+            padding: 12px 18px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .btn:hover {
+            background: #005ecc;
+        }
+        .section-title {
+            margin-top: 25px;
+            font-weight: bold;
+            color: #333;
+        }
+        .user-info {
+            background: #198754;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body onload="carregarDadosUsuario()">
+
+<header>
+    <img src="https://via.placeholder.com/150x40?text=ProBux" alt="logo">
+    <nav>
+        <a href="#" onclick="logout()">Logout</a>
+        <a href="#" onclick="painel()">Painel</a>
+    </nav>
+</header>
+
+<div class="container">
+    <div class="user-info" id="userInfo">Carregando dados...</div>
+    
+    <h2>Dashboard</h2>
+    <p><strong>Usuário:</strong> <span id="userEmail"></span></p>
+    <p><strong>Status:</strong> <span id="userStatus">✔️</span></p>
+    <p><strong>Saldo Disponível:</strong> <span id="userSaldo">R$ 0,00</span></p>
+
+    <div class="section-title">Conta</div>
+    <a href="saldo.html" class="btn">Saldo</a>
+    <a href="sacar.html" class="btn">Sacar</a>
+
+    <div class="section-title">Avaliar</div>
+    <a href="avaliar.html" class="btn">Avaliar Produtos</a>
+
+    <div class="section-title">Anúncios / Ganhar Dinheiro</div>
+    <a href="viewads-botton.html" class="btn">Ver Anúncios</a>
+    <a href="anunciar.html" class="btn">Criar Anúncio</a>
+
+    <div class="section-title">Upgrade</div>
+    <a href="upgrade.html" class="btn">Upgrade de Conta</a>
+    
+    <div class="section-title">Clickers</div>
+    <a href="robots.html" class="btn">Comprar Clickers</a>
+</div>
+
+<script>
+async function carregarDadosUsuario() {
+    const user = JSON.parse(localStorage.getItem('user'));
+    
+    if (!user || !user.id) {
+        alert("Você precisa estar logado!");
+        window.location.href = "login-top.html";
+        return;
+    }
+
+    try {
+        // BUSCA DADOS DIRETO DAS TABELAS
+        const resposta = await fetch(`https://ciclone-62mq.onrender.com/api/dashboard/${user.id}`);
+        const dados = await resposta.json();
+        
+        if (dados.success) {
+            const userData = dados.user;
+            const clicksData = dados.clicks;
+            
+            // PREENCHE DADOS DO USUÁRIO
+            document.getElementById('userInfo').textContent = 
+                `Bem-vindo, ${userData.nome}! | Saldo: R$ ${parseFloat(userData.saldo_redisponivel || 0).toFixed(2)}`;
+            
+            document.getElementById('userEmail').textContent = userData.email;
+            document.getElementById('userSaldo').textContent = `R$ ${parseFloat(userData.saldo_redisponivel || 0).toFixed(2)}`;
+            
+            // STATUS DO USUÁRIO
+            let status = '✔️ Ativo';
+            if (userData.limite_atingido) status = '⏸️ Limite Atingido';
+            if (!userData.recebendo_creditos && !userData.limite_atingido) status = '⏳ Aguardando Vez';
+            
+            document.getElementById('userStatus').textContent = status;
+        }
+    } catch (erro) {
+        console.log('Erro ao carregar dados:', erro);
+        document.getElementById('userInfo').textContent = 'Erro ao carregar dados';
+    }
+}
+
+function logout() {
+    localStorage.removeItem('user');
+    window.location.href = 'login-top.html';
+}
+
+function painel() {
+    window.location.href = 'dashboard.html';
+}
+</script>
+
+</body>
+</html>
