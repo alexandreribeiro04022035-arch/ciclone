@@ -598,7 +598,43 @@ app.get('/api/estatisticas', async (req, res) => {
   }
 });
 
+// ROTA DE ESTATÍSTICAS (adicione no server.js)
+app.get('/api/estatisticas', async (req, res) => {
+  try {
+    // 1. Total de usuários
+    const usuarios = await pool.query('SELECT COUNT(*) as total FROM cadastro');
+    
+    // 2. Total de clicks
+    const clicks = await pool.query('SELECT SUM(total_clicks) as total FROM clicks');
+    
+    // 3. Total de anúncios ativos
+    const anuncios = await pool.query('SELECT COUNT(*) as total FROM anuncios WHERE ativo = true');
+    
+    // 4. Total de avaliações
+    const avaliacoes = await pool.query('SELECT COUNT(*) as total FROM avaliacoes');
+    
+    // 5. Saldo total da plataforma
+    const saldo = await pool.query('SELECT SUM(saldo_redisponivel) as total FROM cadastro');
+    
+    // 6. Próximo a receber (menor ID com saldo)
+    const proximo = await pool.query(
+      'SELECT id, saldo_redisponivel as saldo FROM cadastro WHERE saldo_redisponivel > 0 ORDER BY id ASC LIMIT 1'
+    );
 
+    res.json({
+      success: true,
+      total_usuarios: parseInt(usuarios.rows[0].total) || 0,
+      total_clicks: parseInt(clicks.rows[0].total) || 0,
+      total_anuncios: parseInt(anuncios.rows[0].total) || 0,
+      total_avaliacoes: parseInt(avaliacoes.rows[0].total) || 0,
+      saldo_total: parseFloat(saldo.rows[0].total) || 0,
+      proximo_recebedor: proximo.rows[0] || { id: 0, saldo: 0 }
+    });
+    
+  } catch (error) {
+    res.json({ success: false, error: error.message });
+  }
+});
 
 
 
