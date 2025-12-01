@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Criar Anúncio - CICLONE</title>
+<style>
+    body {
+        background: #e8edf2;
+        margin: 0;
+        font-family: Arial, sans-serif;
+    }
+    .container {
+        width: 500px;
+        margin: 60px auto;
+        background: #fff;
+        padding: 25px;
+        border-radius: 8px;
+        box-shadow: 0 0 12px rgba(0,0,0,0.15);
+    }
+    h2 {
+        text-align: center;
+        margin-bottom: 25px;
+    }
+    input, textarea {
+        width: 100%;
+        padding: 12px;
+        margin: 8px 0;
+        border: 1px solid #b8c2cc;
+        border-radius: 5px;
+        font-size: 15px;
+        box-sizing: border-box;
+    }
+    textarea {
+        height: 80px;
+        resize: vertical;
+    }
+    button {
+        width: 100%;
+        background: #198754;
+        color: white;
+        padding: 12px;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+        margin-top: 10px;
+    }
+    button:hover {
+        background: #157347;
+    }
+    .link {
+        text-align: center;
+        margin-top: 12px;
+        font-size: 14px;
+    }
+    .link a {
+        color: #0d6efd;
+        text-decoration: none;
+        font-weight: bold;
+    }
+</style>
+</head>
+<body onload="verificarLogin()">
+
+<div class="container">
+    <h2>Criar Novo Anúncio</h2>
+
+    <input type="text" id="titulo" placeholder="Título do anúncio">
+    <input type="url" id="banner_url" placeholder="URL do banner (imagem)">
+    <input type="url" id="link_anuncio" placeholder="URL do anúncio (link de destino)">
+    <input type="number" id="tempo_exibicao" placeholder="Tempo de exibição (segundos)" value="30">
+    
+    <button onclick="criarAnuncio()">Criar Anúncio</button>
+
+    <div class="link">
+        <a href="dashboard-botton.html">Voltar ao Dashboard</a>
+    </div>
+    
+    <div id="resultado" style="margin-top: 15px; text-align: center;"></div>
+</div>
+
+<script>
+function verificarLogin() {
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (!user) {
+        window.location.href = 'login-top.html';
+        return;
+    }
+}
+
+async function criarAnuncio() {
+    const titulo = document.getElementById('titulo').value.trim();
+    const banner_url = document.getElementById('banner_url').value.trim();
+    const link_anuncio = document.getElementById('link_anuncio').value.trim();
+    const tempo_exibicao = document.getElementById('tempo_exibicao').value.trim();
+
+    if (!titulo || !banner_url || !link_anuncio || !tempo_exibicao) {
+        mostrarResultado('Preencha todos os campos!', 'error');
+        return;
+    }
+
+    try {
+        const resposta = await fetch('https://ciclone-62mq.onrender.com/api/anuncios', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                titulo: titulo,
+                banner_url: banner_url,
+                link_anuncio: link_anuncio,
+                tempo_exibicao: parseInt(tempo_exibicao)
+            })
+        });
+
+        const dados = await resposta.json();
+
+        if (dados.success) {
+            mostrarResultado('✅ Anúncio criado com sucesso!', 'success');
+            // Limpa os campos
+            document.getElementById('titulo').value = '';
+            document.getElementById('banner_url').value = '';
+            document.getElementById('link_anuncio').value = '';
+            document.getElementById('tempo_exibicao').value = '30';
+        } else {
+            mostrarResultado('Erro: ' + dados.error, 'error');
+        }
+    } catch (erro) {
+        mostrarResultado('Erro de conexão: ' + erro.message, 'error');
+    }
+}
+
+function mostrarResultado(mensagem, tipo) {
+    const resultado = document.getElementById('resultado');
+    resultado.innerHTML = mensagem;
+    resultado.style.color = tipo === 'success' ? '#198754' : '#dc3545';
+    resultado.style.fontWeight = 'bold';
+}
+</script>
+
+</body>
+</html>
