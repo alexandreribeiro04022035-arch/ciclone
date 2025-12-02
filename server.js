@@ -98,7 +98,7 @@ app.post('/api/cadastro', async (req, res) => {
     const result = await pool.query(
       `INSERT INTO cadastro 
        (nome, email, senha, chavepix, telefone, avatar, recebendo_creditos) 
-       VALUES ($1, $2, $3, $4, $5, $6, true) 
+       VALUES ($1, $2, $3, $4, $5, $6, true)  -- ← AQUI: true por padrão
        RETURNING *`,
       [nome, email, senha, chavepix, telefone, avatar]
     );
@@ -109,6 +109,27 @@ app.post('/api/cadastro', async (req, res) => {
     res.status(500).json({ success: false, error: error.message });
   }
 });
+
+
+
+/* app.post('/api/cadastro', async (req, res) => {
+  const { nome, email, senha, chavepix, telefone, avatar } = req.body;
+
+  try {
+    const result = await pool.query(
+      `INSERT INTO cadastro 
+       (nome, email, senha, chavepix, telefone, avatar, recebendo_creditos) 
+       VALUES ($1, $2, $3, $4, $5, $6, true) 
+       RETURNING *`,
+      [nome, email, senha, chavepix, telefone, avatar]
+    );
+
+    res.json({ success: true, user: result.rows[0] });
+
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});  */
 
 // =============================
 // 📊 ROTA DASHBOARD
