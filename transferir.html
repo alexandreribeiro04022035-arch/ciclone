@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Transferir para Quantum</title>
+<style>
+body { font-family: Arial; padding: 20px; }
+input, button { padding: 10px; width: 100%; margin-top: 10px; }
+</style>
+</head>
+<body>
+
+<h2>Transferência PTC → Quantum</h2>
+
+<input id="quantumUser" placeholder="ID do usuário Quantum">
+<input id="valor" placeholder="Valor a transferir">
+<button onclick="transferir()">Transferir</button>
+
+<p id="resp"></p>
+
+<script>
+async function transferir() {
+    const quantumUser = document.getElementById("quantumUser").value;
+    const valor = document.getElementById("valor").value;
+
+    const res = await fetch("/api/ptc_to_quantum", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ quantumUser, valor })
+    });
+
+    const data = await res.json();
+    document.getElementById("resp").innerText = data.message;
+}
+</script>
+
+</body>
+</html>
