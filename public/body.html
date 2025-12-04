@@ -519,7 +519,7 @@
                 <p class="feature-desc">Torne-se membro e ganhe dinheiro visualizando nossos anúncios. Receba pagamentos rápidos e seguros diretamente na sua conta.</p>
             </div>
             
-            <div class="feature-card advertiser">
+            <div   onclick="carregarInfo('anunciante')"    class="feature-card advertiser">
                 <div class="feature-icon">
                     <i class="fas fa-bullhorn"></i>
                 </div>
@@ -878,10 +878,21 @@ function carregarInfo(tipo) {
             "Usuários ganham por visualizar anúncios, estatísticas ao vivo, bônus diários e sistema de level-up.";
     }
 
-    if (tipo === "anunciante") {
-        document.getElementById("texto-anunciante").innerHTML =
-            "Promova seus produtos com alto alcance, cliques reais, controle total e relatórios detalhados.";
-    }
+
+if (tipo === "anunciante") {
+    // Muda o texto (opcional)
+    document.getElementById("texto-anunciante").innerHTML =
+        "Promova seus produtos com alto alcance, cliques reais, controle total e relatórios detalhados.";
+
+    // Abre o link em nova aba
+    window.open("https://website-gamma-sepia-65.vercel.app/index.html", "_blank");
+    
+}
+
+
+
+    
+    
 
     if (tipo === "sobre") {
         document.getElementById("texto-sobre").innerHTML =
