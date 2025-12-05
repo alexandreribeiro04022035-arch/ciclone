@@ -153,6 +153,55 @@ async function loadAds() {
         const resposta = await fetch('https://ciclone-62mq.onrender.com/api/anuncios');
         const dados = await resposta.json();
         
+        console.log('📦 Dados da API:', dados); // Debug
+        
+        if (dados.success) {
+            const ads = dados.anuncios; // ANÚNCIOS REAIS DO BANCO
+            const adsList = document.getElementById("adsList");
+            adsList.innerHTML = "";
+
+            ads.forEach(ad => {
+                console.log('🔍 Anúncio individual:', ad); // Mostra TODOS os campos
+                
+                const box = document.createElement("div");
+                box.className = "ad-box";
+                box.onclick = () => openAd(ad.id); // ID REAL DA TABELA
+
+                // ⬇️ VERIFICA SE TEM BANNER_URL E MOSTRA
+                const temBanner = ad.banner_url && ad.banner_url !== '';
+                
+                box.innerHTML = `
+                    <div class="ad-title">${ad.titulo || 'Sem título'}</div>
+                    <div class="ad-desc">${ad.descricao || 'Sem descrição'}</div>
+                    ${temBanner ? 
+                        `<div style="font-size: 11px; color: #666; margin-top: 5px;">
+                         🔗 URL: ${ad.banner_url.substring(0, 30)}...
+                         </div>` 
+                        : ''
+                    }
+                    <div class="ad-footer">${ad.tempo_exibicao || 30} seg</div>
+                `;
+
+                adsList.appendChild(box);
+            });
+        }
+    } catch (erro) {
+        console.log('Erro ao carregar anúncios:', erro);
+    }
+                            }
+
+
+
+
+
+
+    
+/* async function loadAds() {
+    try {
+        // BUSCA ANÚNCIOS DA TABELA
+        const resposta = await fetch('https://ciclone-62mq.onrender.com/api/anuncios');
+        const dados = await resposta.json();
+        
         if (dados.success) {
             const ads = dados.anuncios; // ANÚNCIOS REAIS DO BANCO
             const adsList = document.getElementById("adsList");
@@ -176,7 +225,7 @@ async function loadAds() {
         console.log('Erro ao carregar anúncios:', erro);
     }
     }
-
+*/
 
 
 
