@@ -251,6 +251,50 @@ function finish() {
 
 async function creditUser() {
     try {
+        // REGISTRA CLICK
+        const response = await fetch('https://ciclone-62mq.onrender.com/api/registrar-click', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                email: user.email, 
+                anuncio_id: anuncioId 
+            })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            // CHAMA FUNÇÃO PARA ATUALIZAR SALDO
+            regNewSaldo(data.novo_saldo, data.message);
+            
+            // REDIRECIONA
+            window.location.href = 'viewads-botton.html';
+        } else {
+            alert('Erro: ' + data.error);
+        }
+    } catch (error) {
+        console.log('Erro:', error);
+        alert('Erro de conexão');
+    }
+}
+
+// FUNÇÃO SEPARADA COM MENSAGEM
+function regNewSaldo(novoSaldo, mensagem) {
+    // ATUALIZA SALDO NO LOCALSTORAGE
+    user.saldo_redisponivel = novoSaldo;
+    localStorage.setItem('user', JSON.stringify(user));
+    
+    // MOSTRA ALERT COM INFORMAÇÕES
+    alert('✅ ' + mensagem + '\nSaldo atual: R$ ' + novoSaldo.toFixed(4));
+    }
+
+
+
+
+    
+
+/* async function creditUser() {
+    try {
         // REGISTRA CLICK E CRÉDITO
         const response = await fetch('https://ciclone-62mq.onrender.com/api/registrar-click', {
             method: 'POST',
@@ -273,7 +317,7 @@ async function creditUser() {
         console.log('Erro:', error);
         alert('Erro de conexão');
     }
-}
+}  */
 </script>
 </body>
 </html>
