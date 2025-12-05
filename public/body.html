@@ -23,14 +23,21 @@
             justify-content: left;
             align-items: flex-start;
             min-height: 100vh;
-        }
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    
+         }
         
-        .container {
-            max-width: 900px;
+
+
+.container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 100%;
             width: 100%;
             background-color: white;
-            border-radius: 12px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             overflow: hidden;
         }
         
@@ -229,6 +236,7 @@
         }
         
         .cta-buttons {
+            flex-direction: column;
             display: flex;
             justify-content: center;
             gap: 15px;
@@ -249,7 +257,9 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
-        }
+             width: 100%;
+            }   
+    
         
         .btn-primary {
             background-color: #1a73e8;
@@ -281,23 +291,8 @@
             .benefits-list {
                 grid-template-columns: 1fr;
             }
+                  
             
-            .cta-buttons {
-                flex-direction: column;
-            }
-            
-            .btn {
-                width: 100%;
-            }
-        }
-    
-    
-  
-
-
-    
-    
-    
 @keyframes rotate { from { transform: rotate(360deg); } to {  transform: rotate(0deg); } }
    @keyframes rolagem-horizontal { from {  transform: translateX(100%); /* Começa fora da tela, à direita */  }to {  transform: translateX(-100%); /* Termina fora da tela, à esquerda */ } }
 
@@ -319,37 +314,12 @@
   animation-iteration-count: infinite; /* Repete a animação para sempre */
 }
  
-    
-    </style>
-    
-    
-   
-    <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
         
-        body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-        
-        .container {
-            background: white;
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            max-width: 100%;
-            width: 100%;
-        }
-
         /* Mantido exatamente igual */
         .figura {
             width: 111px;
@@ -406,9 +376,7 @@
             color: #666;
             font-size: 14px;
         }
-    </style>
     
-    <style>
 /* A caixa flutuante REAL */
 .janela {
     position: fixed;
@@ -444,30 +412,13 @@
 </style>
     
 </head>
-
-
-    
-    
-    
-
 <body>
- 
-    
-    
-    <div class="container">
-     
- 
-
-        
-        
+   <div class="container">
+      
         <!---- div class="feature-card member">
          <div class="feature-icon">
               </div></div ---->
-        
-        
-        <!---- header> </header ---->
-           
-            <!---- p class="tagline">RECEBA PAGAMENTO, A cada 30 segundos!</p>
+             <!---- p class="tagline">RECEBA PAGAMENTO, A cada 30 segundos!</p>
             <p class="developer">Ciclone</p>
          <p class="description"></p>
         
@@ -489,7 +440,6 @@
         <i class="fas fa-clock"></i>
     <i class="fas fa-globe"></i>
                      
-                REG 20 SEGs
           
                 <button class="btn btn-primary"   onclick="abrirJanela('https://ciclone-62mq.onrender.com/register.html ')" >>
                     <i class="fas fa-user-plus"></i> Criar Conta Gratuita
@@ -497,13 +447,9 @@
                 <button class="btn btn-secondary"   onclick="abrirJanela('https://ciclone-62mq.onrender.com/login-top.html  ')" >
                     <i class="fas fa-sign-in-alt"></i> Fazer Login
                 </button>
-            </div>
-        </div>
-        </div>
-        
-         
-        
-        <div class="features-grid">
+            </div>     </div>   </div>
+    
+          <div class="features-grid">
             <div class="feature-card member">
                 <div class="feature-icon">
                     <i class="fas fa-user-tie"></i>
@@ -537,37 +483,23 @@
            <div class="scroll-container">
   <p class="scrolling-text">@Rights 2025; Andre Bonotto, chatGPT5, Ciclone-PTC;  modo Descktop melhora visual; </p>
 </div>  
-        
-        
+            
         <div class="benefits-section">
             <h2 class="section-title">
-                <i class="fas fa-star"></i> Principais benefícios:
-              
-                <i class="fas fa-chart-line"></i> Vantagens exclusivas:
+       <i class="fas fa-star"></i> Principais benefícios:   
+          <i class="fas fa-chart-line"></i> Vantagens exclusivas:
             </h2>
-            
-            <ul class="benefits-list">
-                
+          <ul class="benefits-list">        
           <li class="benefit-item">
-              <i class="fas fa-check-circle"></i> <span>Ganhe dinheiro em casa</span>
+         <i class="fas fa-check-circle"></i> <span>Ganhe dinheiro em casa</span>
            <i class="fas fa-check-circle"></i>  <span>Anúncios garantidos diariamente</span>
           <i class="fas fa-check-circle"></i> <span>Estatísticas detalhadas</span>
-       
-                 <i class="fas fa-check-circle"></i> <span>Permissões do fórum</span> 
-            
-               <i class="fas fa-check-circle"></i><span>Planos de atualização</span>
-   
-                   <i class="fas fa-check-circle"></i> <span>Pagamento instantâneo</span> 
-                   
-    
-                  <i class="fas fa-shield-alt"></i><span>Plataforma 100% segura</span> 
-                
+         <i class="fas fa-check-circle"></i> <span>Permissões do fórum</span> 
+          <i class="fas fa-check-circle"></i><span>Planos de atualização</span>
+           <i class="fas fa-check-circle"></i> <span>Pagamento instantâneo</span>        
+            <i class="fas fa-shield-alt"></i><span>Plataforma 100% segura</span>  
             <i class="fas fa-clock"></i>   <span>Suporte 24/7</span> 
-                 
-               
-                <i class="fas fa-globe"></i> <span>Disponível mundialmente</span> 
-                   
-            
+            <i class="fas fa-globe"></i> <span>Disponível mundialmente</span>       
         </li>   
             </ul>
         </div> <!---- close benefits ---->
@@ -575,35 +507,8 @@
         <div class="feature-card advertiser"> <!----  line red ---->
                 <div class="feature-icon">
                        </div></div>
-        <!--- footer>  </footer --->
-            <!---- iframe src="#">  
-                
-            </iframe ---->
-      
-   
 
-    <script>
-        // Adicionando interatividade aos botões
-        document.querySelector('.btn-primary').addEventListener('click', function() {
-            alert('Ótima escolha! Redirecionando para o formulário de registro...');
-        });
-        
-        document.querySelector('.btn-secondary').addEventListener('click', function() {
-            alert('Redirecionando para a página de login...');
-        });
-        
-        // Adicionando efeito de contador de ganhos
-        const highlight = document.querySelector('.highlight');
-        let seconds = 0;
-        
-        setInterval(() => {
-            seconds += 30;
-            const earnings = (seconds / 30) * 0.01; // R$0.01 a cada 30 segundos
-            highlight.innerHTML = `Agora você pode ganhar dinheiro apenas visualizando anúncios. <br><small>Exemplo: em ${seconds} segundos você poderia ter ganho R$${earnings.toFixed(2)}</small>`;
-        }, 30000); // Atualiza a cada 30 segundos
-    </script>
 
-    
 
         <!-- 🔥 TOPO ORGANIZADO SEM MEXER NO RESTO -->
         <div style="display:flex; justify-content:space-between; align-items:center; width:100%; margin-bottom:30px;">
@@ -705,7 +610,7 @@
                     <input type="email" id="email" name="email" required placeholder="seuemail@exemplo.com">
                 </div>
                 
-                <button type="submit" class="btn-login" id="loginBtn">
+                <button type="submit" class="cta-buttons" id="loginBtn">
                     Entrar no Painel
                 </button>
                 
@@ -761,10 +666,7 @@
     <div class="scroll-container">
         <p class="scrolling-text">@Rights 2025; Andre Bonotto, chatGPT5, Ciclone-PTC; modo Desktop melhora visual;</p>
     </div>
-    
-        
-        
-        
+      
         
  </div> <!---- close container  ---->
     <script>
@@ -858,12 +760,7 @@
                 document.getElementById('email').value = savedEmail;
             }
         });
-    </script>
-    
-    
-    
-    
-    <script>
+
 function carregarInfo(tipo) {
 
     if (tipo === "membro") {
@@ -879,13 +776,7 @@ if (tipo === "anunciante") {
 
     // Abre o link em nova aba
     window.open("https://website-gamma-sepia-65.vercel.app/index.html", "_blank");
-    
-}
-
-
-
-    
-    
+    }
 
     if (tipo === "sobre") {
         document.getElementById("texto-sobre").innerHTML =
@@ -893,12 +784,8 @@ if (tipo === "anunciante") {
        window.open("https://fakebook-orpin.vercel.app/", "_blank");
     }
 }
-</script>
-    
-<script>
-function abrirJanela(arquivo){
 
-    // Criar a janela
+function abrirJanela(arquivo){
     const janela = document.createElement("div");
     janela.className = "janela";
 
@@ -956,31 +843,42 @@ function dragElement(el) {
         document.onmousemove = null;
     }
 }
-</script>
 
-    <script>
+// Adicionando interatividade aos botões
+        document.querySelector('.btn-primary').addEventListener('click', function() {
+            alert('Ótima escolha! Redirecionando para o formulário de registro...');
+        });
+        
+        document.querySelector('.btn-secondary').addEventListener('click', function() {
+            alert('Redirecionando para a página de login...');
+        });
+        
+        // Adicionando efeito de contador de ganhos
+        const highlight = document.querySelector('.highlight');
+        let seconds = 0;
+        
+        setInterval(() => {
+            seconds += 30;
+            const earnings = (seconds / 30) * 0.01; // R$0.01 a cada 30 segundos
+            highlight.innerHTML = `Agora você pode ganhar dinheiro apenas visualizando anúncios. <br><small>Exemplo: em ${seconds} segundos você poderia ter ganho R$${earnings.toFixed(2)}</small>`;
+        }, 30000); // Atualiza a cada 30 segundos
+   
+
+
+
+        
 function OpenInfos1() {
     const conteudo = `
         <h2>CICLONE PTC</h2>
-
         <p>Pagamos R$ 0,0001 por click</p>
-
         <p>A conta Free nao paga</p>
-
         <p>A conta Pro paga por chave PIX</p>
-
         <p>O upgrade da conta e R$ 15,00</p>
-
         <p>Pagamos R$ 0,0001 por click</p>
-
         <p>Tu vota no produto de 0 ate 9</p>
-
         <p>produtos ficam com status da qualidade</p>
-
         <p>conforme as notas</p>
-
         <p>Pagamos R$ 0,0001 por click</p>
-
         <p>Duvidas veja nosso FÓRUM</p>
 
         <p>
@@ -988,9 +886,7 @@ function OpenInfos1() {
                 Nosso FORUM
             </a>
         </p>
-
         <p>O Upgrade pode ser feito pelo whatsapp 21 999102951</p>
-
         <p>Pagamos R$ 0,0001 por click</p>
 
         <p>
@@ -1000,25 +896,17 @@ function OpenInfos1() {
         </p>
 
         <p>Este PTC e o unico que paga</p>
-
         <p>Nao perca tempo com outros</p>
-
         <p>Receba na tua chave pix</p>
-
         <p>Tua renda extra nas horas vagas</p>
-
         <p>Pagamos R$ 0,0001 por click</p>
-
         <p>Ganhe para AVALIAR produtos e servicos</p>
-
         <p>Teu voto de 0 a 9 e muito importante</p>
-
         <p>atesta a qualidade da marca</p>
-
         <p>Participe do nosso FORUM</p>
 
         <p>
-            <a href="https://messages-group.vercel.app" target="_blank">
+         <a href="https://messages-group.vercel.app" target="_blank">
                 Nosso FORUM
             </a>
         </p>
@@ -1027,10 +915,7 @@ function OpenInfos1() {
     document.getElementById("infosBox").innerHTML = conteudo;
 }
 </script>
-    
-    
-    
-    
+   
 </body>
 </html>
 
