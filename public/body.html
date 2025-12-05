@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ciclone</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f0f2f5;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            display: flex;
+            justify-content: left;
+            align-items: flex-start;
+            min-height: 100vh;
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    
+         }
+        
+
+
+.container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 100%;
+            width: 100%;
+            background-color: white;
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(to right, #1a73e8, #0d5bb5);
+            color: white;
+            padding: 25px 30px;
+            text-align: center;
+            border-bottom: 5px solid #ffc107;
+        }
+        
+        .logo {
+            font-size: 2.8rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: left;
+           justify-content: left;
+            gap: 10px;
+            animation: rotate 5s infinite linear;
+        }
+        
+        .logo i {
+            align: left;
+            color: #ffc107;
+        }
+        
+        .tagline {
+            font-size: 0.95rem;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+        
+        .developer {
+            font-size: 0.85rem;
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+        
+        .highlight {
+            background-color: #ffc107;
+            color: #333;
+            padding: 12px 20px;
+            margin: 20px 30px 30px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 1.1rem;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .description {
+            padding: 0 30px 20px;
+            text-align: center;
+            font-size: 1.05rem;
+            color: #555;
+        }
+        
+        hr {
+            border: none;
+            height: 1px;
+            background-color: #e0e0e0;
+            margin: 0 30px 30px;
+        }
+        
+        .register-section {
+            text-align: center;
+            padding: 0 30px 30px;
+        }
+        
+        .register-title {
+            background-color: #1a73e8;
+            color: white;
+            display: inline-block;
+            padding: 10px 25px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 1.3rem;
+            margin-bottom: 25px;
+            box-shadow: 0 3px 6px rgba(26, 115, 232, 0.3);
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            padding: 0 30px 30px;
+        }
+        
+        .feature-card {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px 20px;
+            text-align: center;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+            border-top: 4px solid #1a73e8;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .feature-card.member {
+            border-top-color: #34a853;
+        }
+        
+        .feature-card.advertiser {
+            border-top-color: #ea4335;
+        }
+        
+        .feature-card.about {
+            border-top-color: #fbbc05;
+        }
+        
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: #1a73e8;
+        }
+        
+        .member .feature-icon {
+            color: #34a853;
+        }
+        
+        .advertiser .feature-icon {
+            color: #ea4335;
+        }
+        
+        .about .feature-icon {
+            color: #fbbc05;
+        }
+        
+        .feature-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .feature-desc {
+            color: #666;
+            font-size: 0.95rem;
+        }
+        
+        .benefits-section {
+            padding: 0 30px 30px;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1a73e8;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f2f5;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-title i {
+            color: #ffc107;
+        }
+        
+        .benefits-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+            list-style-type: none;
+        }
+        
+        .benefit-item {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .benefit-item i {
+            color: #34a853;
+            font-size: 1.2rem;
+        }
+        
+        footer {
+            background-color: #f8f9fa;
+            padding: 20px 30px;
+            text-align: center;
+            color: #666;
+            font-size: 0.9rem;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .cta-buttons {
+            flex-direction: column;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            margin-bottom: 30px;
+            padding: 0 30px;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            font-size: 1rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+             width: 100%;
+            }   
+    
+        
+        .btn-primary {
+            background-color: #1a73e8;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #0d5bb5;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(26, 115, 232, 0.3);
+        }
+        
+        .btn-secondary {
+            background-color: #f8f9fa;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #e8e8e8;
+            transform: translateY(-2px);
+        }
+        
+        @media (max-width: 768px) {
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .benefits-list {
+                grid-template-columns: 1fr;
+            }
+                  
+            
+@keyframes rotate { from { transform: rotate(360deg); } to {  transform: rotate(0deg); } }
+   @keyframes rolagem-horizontal { from {  transform: translateX(100%); /* Começa fora da tela, à direita */  }to {  transform: translateX(-100%); /* Termina fora da tela, à esquerda */ } }
+
+     .scroll-container {
+  width: 100%; /* Largura do container visível */
+  overflow: hidden; /* Esconde o que sai do container */
+  white-space: nowrap; /* Impede que o texto quebre em várias linhas */
+  background-color: yellow; /* Um fundo para visualizar o container */
+  padding: 10px;
+ color:black;
+}
+
+.scrolling-text {
+  display: inline-block; /* Permite que o transform funcione */
+  padding-left: 100%; /* Inicia a animação do lado de fora, à direita */
+  animation-name: rolagem-horizontal;
+  animation-duration: 30s; /* Tempo total da animação */
+  animation-timing-function: linear; /* Velocidade constante */
+  animation-iteration-count: infinite; /* Repete a animação para sempre */
+}
+ 
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        /* Mantido exatamente igual */
+        .figura {
+            width: 111px;
+            height: 111px;
+            background-color: white;
+            border-radius: 50%;
+            color: red;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: arial, sans-serif;
+            box-shadow: 5px 5px 10px rgba(0,0,0,0.5);
+            animation: rotator 3s infinite linear;
+        }
+
+        @keyframes rotator {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .links-section {
+            margin-bottom: 30px;
+        }
+ 
+        .link-card {
+            display: flex;
+            align-items: center;
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            text-decoration: none;
+            color: #333;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .link-card:hover {
+            transform: translateY(-3px);
+            border-color: #667eea;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .login-section {
+            background: #e8f5e8;
+            padding: 25px;
+            border-radius: 15px;
+            border: 2px dashed #4CAF50;
+        }
+
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+        }
+    
+/* A caixa flutuante REAL */
+.janela {
+    position: fixed;
+    top: 100px;
+    left: 100px;
+    width: 420px;
+    height: 550px;
+    background: #fff;
+    color: #000;
+    border-radius: 10px;
+    box-shadow: 0 0 15px #000;
+    z-index: 99999;
+    resize: both;
+    overflow: auto;
+}
+
+/* Barra superior para arrastar */
+.janela-header {
+    background: #333;
+    color: #fff;
+    padding: 10px;
+    cursor: move;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.janela-close {
+    cursor: pointer;
+    font-size: 18px;
+}
+</style>
+    
+</head>
+<body>
+   <div class="container">
+      
+        <div class="feature-card member"> <!----  line green  ---->
+         <div class="feature-icon">
+              </div></div>
+        
+        <div class="register-section">
+            <div class="register-title">
+                 <div class="cta-buttons">
+                     
+       <div class="logo" >  
+              <i class="fas fa-coins"></i>
+              CICLONE</div>
+        <i class="fas fa-clock"></i>
+    <i class="fas fa-globe"></i>
+                     
+          
+                <button class="btn btn-primary"   onclick="abrirJanela('https://ciclone-62mq.onrender.com/register.html ')" >
+                    <i class="fas fa-user-plus"></i> Criar Conta Gratuita
+              
+                <button class="btn btn-secondary"   onclick="abrirJanela('https://ciclone-62mq.onrender.com/login-top.html  ')" >
+                    <i class="fas fa-sign-in-alt"></i> Fazer Login
+                </button>
+            </div>     </div>   </div>
+    
+          <div class="features-grid">
+            <div class="feature-card member">
+                <div class="feature-icon">
+                    <i class="fas fa-user-tie"></i>
+                </div>
+                <h3 class="feature-title">Membro</h3>
+                <p class="feature-desc">Torne-se membro e ganhe dinheiro visualizando nossos anúncios. Receba pagamentos rápidos e seguros diretamente na sua conta.</p>
+            </div>
+            
+            <div   onclick="carregarInfo('anunciante')"    class="feature-card advertiser">
+                <div class="feature-icon">
+                    <i class="fas fa-bullhorn"></i>
+                </div>
+                <h3 class="feature-title">Anunciante</h3>
+                <p class="feature-desc">Aumente suas vendas e o tráfego exibindo anúncios. Alcance milhares de usuários interessados em seu produto ou serviço.</p>
+            </div>
+            
+         
+            <div class="feature-card about"   onclick="OpenInfos1()">
+                <div class="feature-icon">
+                    <i class="fas fa-info-circle"></i>
+                </div>
+                <h3 class="feature-title">Sobre nós</h3>
+                <p class="feature-desc">Oferecemos excelentes soluções empresariais em um ambiente descontraído. Comprometidos com a qualidade e satisfação dos nossos usuários.</p>
+                  <div id="infosBox"></div> 
+            </div>
+        </div>
+         <div class="feature-card about"> <!---- line yellow ---->
+                <div class="feature-icon">  
+          </div></div>
+      
+           <div class="scroll-container">
+  <p class="scrolling-text">@Rights 2025; Andre Bonotto, chatGPT5, Ciclone-PTC;  modo Descktop melhora visual; </p>
+</div>  
+            
+        <div class="benefits-section">
+            <h2 class="section-title">
+       <i class="fas fa-star"></i> Principais benefícios:   
+          <i class="fas fa-chart-line"></i> Vantagens exclusivas:
+            </h2>
+          <ul class="benefits-list">        
+          <li class="benefit-item">
+         <i class="fas fa-check-circle"></i> <span>Ganhe dinheiro em casa</span>
+           <i class="fas fa-check-circle"></i>  <span>Anúncios garantidos diariamente</span>
+          <i class="fas fa-check-circle"></i> <span>Estatísticas detalhadas</span>
+         <i class="fas fa-check-circle"></i> <span>Permissões do fórum</span> 
+          <i class="fas fa-check-circle"></i><span>Planos de atualização</span>
+           <i class="fas fa-check-circle"></i> <span>Pagamento instantâneo</span>        
+            <i class="fas fa-shield-alt"></i><span>Plataforma 100% segura</span>  
+            <i class="fas fa-clock"></i>   <span>Suporte 24/7</span> 
+            <i class="fas fa-globe"></i> <span>Disponível mundialmente</span>       
+        </li>   
+            </ul>
+        </div> <!---- close benefits ---->
+
+        <div class="feature-card advertiser"> <!----  line red ---->
+                <div class="feature-icon">
+                       </div></div>
+
+
+
+        <!-- 🔥 TOPO ORGANIZADO SEM MEXER NO RESTO -->
+        <div style="display:flex; justify-content:space-between; align-items:center; width:100%; margin-bottom:30px;">
+
+            <!-- ESQUERDA: CÍRCULO GIRANDO -->
+            <div class="logo" >
+                <div class="figura">
+                    <p><b>🚀CICLONE</b></p>
+                </div>
+            </div>
+
+            <!-- DIREITA: LINKS COM FIGURAS EM CIMA -->
+            <div style="display:flex; gap:25px; align-items:center;">
+
+                <div style="text-align:center;">
+                    <div class="link-icon" style="font-size:30px;">💰</div>
+                    <a href="login-top.html">Ganhar Dinheiro</a>
+                </div>
+
+                <div style="text-align:center;">
+                    <div class="link-icon" style="font-size:30px;">👤</div>
+                    <a href="register.html">Cadastro</a>
+                </div>
+
+            </div>
+        </div>
+        <!-- 🔥 FIM DO TOPO -->
+
+        <div class="links-section">
+            <a href="https://appviral.vercel.app/cadastro.html" class="link-card">
+                <div class="link-icon">👤</div>
+                <div class="link-text">
+                    <h3>Cadastro</h3>
+                    <p>Faça seu cadastro e ganhe R$ 5,00 de bônus</p>
+                </div>
+                <div class="link-icon">→</div>
+            </a>
+            
+            <a href="https://messages-group.vercel.app/" target="_blank" class="link-card">
+                <div class="link-icon">💬</div>
+                <div class="link-text">
+                    <h3>Fórum</h3>
+                    <p>Participe da nossa comunidade e tire suas dúvidas</p>
+                </div>
+                <div class="link-icon">→</div>
+            </a>
+            
+            <a href="https://appviral.vercel.app/appviral.html" class="link-card">
+                <div class="link-icon">💰</div>
+                <div class="link-text">
+                    <h3>Ver Tarefas</h3>
+                    <p>Complete tarefas e ganhe dinheiro</p>
+                </div>
+                <div class="link-icon">→</div>
+            </a>
+
+            <a href="https://ciclone-62mq.onrender.com/" target="_blank" class="link-card">
+                <div class="link-icon">🌪️</div>
+                <div class="link-text">
+                    <h3>CICLONE PTC</h3>
+                    <p>Acesse o site principal do CICLONE PTC</p>
+                </div>
+                <div class="link-icon">→</div>
+            </a>
+            
+            <a href="https://ciclone-62mq.onrender.com/register.html" target="_blank" class="link-card">
+                <div class="link-icon">📝</div>
+                <div class="link-text">
+                    <h3>Cadastro Ciclone PTC</h3>
+                    <p>Cadastro oficial no site CICLONE PTC</p>
+                </div>
+                <div class="link-icon">→</div>
+            </a>
+            
+            <a href="https://ciclone-62mq.onrender.com/viewads-botton.html" target="_blank" class="link-card">
+                <div class="link-icon">📺</div>
+                <div class="link-text">
+                    <h3>Ver Anúncios</h3>
+                    <p>Assista anúncios e ganhe dinheiro</p>
+                </div>
+                <div class="link-icon">→</div>
+            </a>
+            
+            <a href="https://ciclone-62mq.onrender.com/produtos.html" target="_blank" class="link-card">
+                <div class="link-icon">⭐</div>
+                <div class="link-text">
+                    <h3>Avaliar Produtos</h3>
+                    <p>Avalie produtos e ganhe recompensas</p>
+                </div>
+                <div class="link-icon">→</div>
+            </a>
+        </div>
+        
+        <div class="login-section">
+            <h2>🔐 Acesso Rápido</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="email">Digite seu e-mail cadastrado:</label>
+                    <input type="email" id="email" name="email" required placeholder="seuemail@exemplo.com">
+                </div>
+                
+                <button type="submit" class="cta-buttons" id="loginBtn">
+                    Entrar no Painel
+                </button>
+                
+                <div class="loading" id="loading">
+                    Verificando e-mail...
+                </div>
+                
+                <div id="message" class="message"></div>
+            </form>
+        </div>
+        
+        <div class="footer">
+            <p>© 2024 CICLONE PTC - Todos os direitos reservados</p>
+        </div>
+    
+        
+    
+    <!-- LOGO -->
+    <div class="logo">
+        <i class="fas fa-coins"></i> CICLONE
+    </div>
+
+    <!-- BLOCOS CLICÁVEIS EMBAIXO DO LOGO -->
+    <div class="features-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:20px; padding:20px;">
+
+        <div class="feature-card member" onclick="carregarInfo('membro')" id="card-membro">
+            <div class="feature-icon"><i class="fas fa-user-tie"></i></div>
+            <h3 class="feature-title">Membro</h3>
+            <p class="feature-desc" id="texto-membro">
+                Torne-se membro e ganhe dinheiro visualizando anúncios todos os dias.
+            </p>
+        </div>
+
+        <div class="feature-card advertiser" onclick="carregarInfo('anunciante')" id="card-anunciante">
+            <div class="feature-icon"><i class="fas fa-bullhorn"></i></div>
+            <h3 class="feature-title">Anunciante</h3>
+            <p class="feature-desc" id="texto-anunciante">
+                Anuncie aqui e alcance milhares de visitantes diariamente.
+            </p>
+        </div>
+
+        <div class="feature-card about" onclick="carregarInfo('sobre')" id="card-sobre">
+            <div class="feature-icon">   <i class="fas fa-users"></i>  </div>
+            <h3 class="feature-title">FakeBook </h3>
+            <p class="feature-desc" id="texto-sobre">
+                FakeBook Rede Social 
+            </p>
+        </div>
+
+    </div>
+    
+          <!-- SCROLL FOOTER -->
+    <div class="scroll-container">
+        <p class="scrolling-text">@Rights 2025; Andre Bonotto, chatGPT5, Ciclone-PTC; modo Desktop melhora visual;</p>
+    </div>
+      
+        
+ </div>
+    <script>
+        const SUPABASE_URL = "https://dpzxdwzlcrerezmloidk.supabase.co";
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRwenhkd3psY3JlcmV6bWxvaWRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2NjIxNTksImV4cCI6MjA3OTIzODE1OX0.ls_1EaTrSDpgsiKzInPncJe7myMRkHFY71HiozKqxIY";
+
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const loginBtn = document.getElementById('loginBtn');
+            const loadingDiv = document.getElementById('loading');
+            const messageDiv = document.getElementById('message');
+            
+            if (!email) {
+                messageDiv.className = 'message error';
+                messageDiv.innerHTML = '❌ Digite seu e-mail!';
+                messageDiv.style.display = 'block';
+                return;
+            }
+            
+            loginBtn.disabled = true;
+            loadingDiv.style.display = 'block';
+            messageDiv.style.display = 'none';
+            
+            try {
+                const response = await fetch(
+                    `${SUPABASE_URL}/rest/v1/appviral?select=id,email,nome,saldo&email=ilike.${encodeURIComponent(email)}`, 
+                    {
+                        headers: {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`,
+                            'Accept': 'application/json'
+                        }
+                    }
+                );
+                
+                if (!response.ok) throw new Error('Erro ao verificar e-mail');
+                
+                const data = await response.json();
+                
+                if (data.length === 0) {
+                    messageDiv.className = 'message error';
+                    messageDiv.innerHTML = '❌ E-mail não cadastrado!<br><a href="cadastro.html" style="color:#721c24;font-weight:bold;">Clique aqui para se cadastrar</a>';
+                    messageDiv.style.display = 'block';
+                    loginBtn.disabled = false;
+                    loadingDiv.style.display = 'none';
+                    return;
+                }
+                
+                const usuario = data[0];
+                
+                await fetch(`${SUPABASE_URL}/rest/v1/appviral?id=eq.${usuario.id}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`
+                    },
+                    body: JSON.stringify({
+                        last_active: new Date().toISOString(),
+                        status_online: true
+                    })
+                });
+                
+                localStorage.setItem('user_id', usuario.id);
+                localStorage.setItem('user_email', usuario.email);
+                localStorage.setItem('user_name', usuario.nome);
+                localStorage.setItem('user_balance', usuario.saldo);
+                
+                messageDiv.className = 'message success';
+                messageDiv.innerHTML = `✅ Login bem-sucedido!<br>Redirecionando...`;
+                messageDiv.style.display = 'block';
+                
+                setTimeout(() => {
+                    window.location.href = `appviral.html?id=${usuario.id}&email=${encodeURIComponent(usuario.email)}`;
+                }, 1500);
+                
+            } catch (error) {
+                messageDiv.className = 'message error';
+                messageDiv.innerHTML = '❌ Erro ao fazer login:<br>' + error.message;
+                messageDiv.style.display = 'block';
+                loginBtn.disabled = false;
+                loadingDiv.style.display = 'none';
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedEmail = localStorage.getItem('user_email');
+            if (savedEmail) {
+                document.getElementById('email').value = savedEmail;
+            }
+        });
+
+function carregarInfo(tipo) {
+
+    if (tipo === "membro") {
+        document.getElementById("texto-membro").innerHTML =
+            "Usuários ganham por visualizar anúncios, estatísticas ao vivo, bônus diários e sistema de level-up.";
+    }
+
+
+if (tipo === "anunciante") {
+    // Muda o texto (opcional)
+    document.getElementById("texto-anunciante").innerHTML =
+        "Promova seus produtos com alto alcance, cliques reais, controle total e relatórios detalhados.";
+
+    // Abre o link em nova aba
+    window.open("https://website-gamma-sepia-65.vercel.app/index.html", "_blank");
+    }
+
+    if (tipo === "sobre") {
+        document.getElementById("texto-sobre").innerHTML =
+            "FakeBook ";
+       window.open("https://fakebook-orpin.vercel.app/", "_blank");
+    }
+}
+
+function abrirJanela(arquivo){
+    const janela = document.createElement("div");
+    janela.className = "janela";
+
+    janela.innerHTML = `
+        <div class="janela-header">
+            <span>Janela Flutuante</span>
+            <span class="janela-close" onclick="this.parentElement.parentElement.remove()">✖</span>
+        </div>
+        <div class="janela-conteudo">Carregando...</div>
+    `;
+
+    document.body.appendChild(janela);
+
+    // Carregar o arquivo HTML inteiro
+    fetch(arquivo)
+      .then(r => r.text())
+      .then(html => {
+          janela.querySelector(".janela-conteudo").innerHTML = html;
+      });
+
+    // Transformar em janela arrastável
+    dragElement(janela);
+}
+
+
+// FUNÇÃO PRA ARRRASTAR IGUAL JANELA DO WINDOWS
+function dragElement(el) {
+    const header = el.querySelector(".janela-header");
+    let x = 0, y = 0, mx = 0, my = 0;
+
+    header.onmousedown = dragStart;
+
+    function dragStart(e) {
+        e.preventDefault();
+        mx = e.clientX;
+        my = e.clientY;
+        document.onmouseup = dragEnd;
+        document.onmousemove = dragMove;
+    }
+
+    function dragMove(e) {
+        e.preventDefault();
+
+        x = mx - e.clientX;
+        y = my - e.clientY;
+        mx = e.clientX;
+        my = e.clientY;
+
+        el.style.top = (el.offsetTop - y) + "px";
+        el.style.left = (el.offsetLeft - x) + "px";
+    }
+
+    function dragEnd() {
+        document.onmouseup = null;
+        document.onmousemove = null;
+    }
+}
+
+// Adicionando interatividade aos botões
+        document.querySelector('.btn-primary').addEventListener('click', function() {
+            alert('Ótima escolha! Redirecionando para o formulário de registro...');
+        });
+        
+        document.querySelector('.btn-secondary').addEventListener('click', function() {
+            alert('Redirecionando para a página de login...');
+        });
+        
+        // Adicionando efeito de contador de ganhos
+        const highlight = document.querySelector('.highlight');
+        let seconds = 0;
+        
+        setInterval(() => {
+            seconds += 30;
+            const earnings = (seconds / 30) * 0.01; // R$0.01 a cada 30 segundos
+            highlight.innerHTML = `Agora você pode ganhar dinheiro apenas visualizando anúncios. <br><small>Exemplo: em ${seconds} segundos você poderia ter ganho R$${earnings.toFixed(2)}</small>`;
+        }, 30000); // Atualiza a cada 30 segundos
+   
+
+
+
+        
+function OpenInfos1() {
+    const conteudo = `
+        <h2>CICLONE PTC</h2>
+        <p>Pagamos R$ 0,0001 por click</p>
+        <p>A conta Free nao paga</p>
+        <p>A conta Pro paga por chave PIX</p>
+        <p>O upgrade da conta e R$ 15,00</p>
+        <p>Pagamos R$ 0,0001 por click</p>
+        <p>Tu vota no produto de 0 ate 9</p>
+        <p>produtos ficam com status da qualidade</p>
+        <p>conforme as notas</p>
+        <p>Pagamos R$ 0,0001 por click</p>
+        <p>Duvidas veja nosso FÓRUM</p>
+
+        <p>
+            <a href="https://eike-bat.vercel.app" target="_blank">
+                Nosso FORUM
+            </a>
+        </p>
+        <p>O Upgrade pode ser feito pelo whatsapp 21 999102951</p>
+        <p>Pagamos R$ 0,0001 por click</p>
+
+        <p>
+            <a href="https://eike-bat.vercel.app" target="_blank">
+                Nosso FORUM
+            </a>
+        </p>
+
+        <p>Este PTC e o unico que paga</p>
+        <p>Nao perca tempo com outros</p>
+        <p>Receba na tua chave pix</p>
+        <p>Tua renda extra nas horas vagas</p>
+        <p>Pagamos R$ 0,0001 por click</p>
+        <p>Ganhe para AVALIAR produtos e servicos</p>
+        <p>Teu voto de 0 a 9 e muito importante</p>
+        <p>atesta a qualidade da marca</p>
+        <p>Participe do nosso FORUM</p>
+
+        <p>
+         <a href="https://messages-group.vercel.app" target="_blank">
+                Nosso FORUM
+            </a>
+        </p>
+    `;
+
+    document.getElementById("infosBox").innerHTML = conteudo;
+}
+</script>
+   
+</body>
+</html>
