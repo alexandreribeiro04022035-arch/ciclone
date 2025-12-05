@@ -1,0 +1,575 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ciclone</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f0f2f5;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            display: flex;
+            justify-content: left;
+            align-items: flex-start;
+            min-height: 100vh;
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    
+         }
+        
+
+
+.container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 100%;
+            width: 100%;
+            background-color: white;
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(to right, #1a73e8, #0d5bb5);
+            color: white;
+            padding: 25px 30px;
+            text-align: center;
+            border-bottom: 5px solid #ffc107;
+        }
+        
+        .logo {
+            font-size: 2.8rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: left;
+           justify-content: left;
+            gap: 10px;
+            animation: rotate 5s infinite linear;
+        }
+        
+        .logo i {
+            align: left;
+            color: #ffc107;
+        }
+        
+        .tagline {
+            font-size: 0.95rem;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+        
+        .developer {
+            font-size: 0.85rem;
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+        
+        .highlight {
+            background-color: #ffc107;
+            color: #333;
+            padding: 12px 20px;
+            margin: 20px 30px 30px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 1.1rem;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .description {
+            padding: 0 30px 20px;
+            text-align: center;
+            font-size: 1.05rem;
+            color: #555;
+        }
+        
+        hr {
+            border: none;
+            height: 1px;
+            background-color: #e0e0e0;
+            margin: 0 30px 30px;
+        }
+        
+        .register-section {
+            text-align: center;
+            padding: 0 30px 30px;
+        }
+        
+        .register-title {
+            background-color: #1a73e8;
+            color: white;
+            display: inline-block;
+            padding: 10px 25px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 1.3rem;
+            margin-bottom: 25px;
+            box-shadow: 0 3px 6px rgba(26, 115, 232, 0.3);
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            padding: 0 30px 30px;
+        }
+        
+        .feature-card {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px 20px;
+            text-align: center;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+            border-top: 4px solid #1a73e8;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .feature-card.member {
+            border-top-color: #34a853;
+        }
+        
+        .feature-card.advertiser {
+            border-top-color: #ea4335;
+        }
+        
+        .feature-card.about {
+            border-top-color: #fbbc05;
+        }
+        
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: #1a73e8;
+        }
+        
+        .member .feature-icon {
+            color: #34a853;
+        }
+        
+        .advertiser .feature-icon {
+            color: #ea4335;
+        }
+        
+        .about .feature-icon {
+            color: #fbbc05;
+        }
+        
+        .feature-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .feature-desc {
+            color: #666;
+            font-size: 0.95rem;
+        }
+        
+        .benefits-section {
+            padding: 0 30px 30px;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1a73e8;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f2f5;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-title i {
+            color: #ffc107;
+        }
+        
+        .benefits-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+            list-style-type: none;
+        }
+        
+        .benefit-item {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .benefit-item i {
+            color: #34a853;
+            font-size: 1.2rem;
+        }
+        
+        footer {
+            background-color: #f8f9fa;
+            padding: 20px 30px;
+            text-align: center;
+            color: #666;
+            font-size: 0.9rem;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .cta-buttons {
+            flex-direction: column;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            margin-bottom: 30px;
+            padding: 0 30px;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            font-size: 1rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+             width: 100%;
+            }   
+    
+        
+        .btn-primary {
+            background-color: #1a73e8;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #0d5bb5;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(26, 115, 232, 0.3);
+        }
+        
+        .btn-secondary {
+            background-color: #f8f9fa;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #e8e8e8;
+            transform: translateY(-2px);
+        }
+        
+        @media (max-width: 768px) {
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .benefits-list {
+                grid-template-columns: 1fr;
+            }
+                  
+            
+@keyframes rotate { from { transform: rotate(360deg); } to {  transform: rotate(0deg); } }
+   @keyframes rolagem-horizontal { from {  transform: translateX(100%); /* Começa fora da tela, à direita */  }to {  transform: translateX(-100%); /* Termina fora da tela, à esquerda */ } }
+
+     .scroll-container {
+  width: 100%; /* Largura do container visível */
+  overflow: hidden; /* Esconde o que sai do container */
+  white-space: nowrap; /* Impede que o texto quebre em várias linhas */
+  background-color: yellow; /* Um fundo para visualizar o container */
+  padding: 10px;
+ color:black;
+}
+
+.scrolling-text {
+  display: inline-block; /* Permite que o transform funcione */
+  padding-left: 100%; /* Inicia a animação do lado de fora, à direita */
+  animation-name: rolagem-horizontal;
+  animation-duration: 30s; /* Tempo total da animação */
+  animation-timing-function: linear; /* Velocidade constante */
+  animation-iteration-count: infinite; /* Repete a animação para sempre */
+}
+ 
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        /* Mantido exatamente igual */
+        .figura {
+            width: 111px;
+            height: 111px;
+            background-color: white;
+            border-radius: 50%;
+            color: red;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: arial, sans-serif;
+            box-shadow: 5px 5px 10px rgba(0,0,0,0.5);
+            animation: rotator 3s infinite linear;
+        }
+
+        @keyframes rotator {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .links-section {
+            margin-bottom: 30px;
+        }
+ 
+        .link-card {
+            display: flex;
+            align-items: center;
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            text-decoration: none;
+            color: #333;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .link-card:hover {
+            transform: translateY(-3px);
+            border-color: #667eea;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .login-section {
+            background: #e8f5e8;
+            padding: 25px;
+            border-radius: 15px;
+            border: 2px dashed #4CAF50;
+        }
+
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+        }
+    
+/* A caixa flutuante REAL */
+.janela {
+    position: fixed;
+    top: 100px;
+    left: 100px;
+    width: 420px;
+    height: 550px;
+    background: #fff;
+    color: #000;
+    border-radius: 10px;
+    box-shadow: 0 0 15px #000;
+    z-index: 99999;
+    resize: both;
+    overflow: auto;
+}
+
+/* Barra superior para arrastar */
+.janela-header {
+    background: #333;
+    color: #fff;
+    padding: 10px;
+    cursor: move;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.janela-close {
+    cursor: pointer;
+    font-size: 18px;
+}
+</style>
+    
+</head>
+<body>
+   <div class="container">
+      
+
+
+
+
+       
+    
+          <div class="features-grid">
+            <div class="feature-card member">
+                <div class="feature-icon">
+                    <i class="fas fa-user-tie"></i>
+                </div>
+                <h3 class="feature-title">Membro</h3>
+                <p class="feature-desc">Torne-se membro e ganhe dinheiro visualizando nossos anúncios. Receba pagamentos rápidos e seguros diretamente na sua conta.</p>
+            </div>
+            
+            <div   onclick="carregarInfo('anunciante')"    class="feature-card advertiser">
+                <div class="feature-icon">
+                    <i class="fas fa-bullhorn"></i>
+                </div>
+                <h3 class="feature-title">Anunciante</h3>
+                <p class="feature-desc">Aumente suas vendas e o tráfego exibindo anúncios. Alcance milhares de usuários interessados em seu produto ou serviço.</p>
+            </div>
+            
+         
+            <div class="feature-card about"   onclick="OpenInfos1()">
+                <div class="feature-icon">
+                    <i class="fas fa-info-circle"></i>
+                </div>
+                <h3 class="feature-title">Sobre nós</h3>
+                <p class="feature-desc">Oferecemos excelentes soluções empresariais em um ambiente descontraído. Comprometidos com a qualidade e satisfação dos nossos usuários.</p>
+                  <div id="infosBox"></div> 
+            </div>
+        </div>
+         <div class="feature-card about"> <!---- line yellow ---->
+                <div class="feature-icon">  
+          </div></div>
+      
+           
+
+        <div class="feature-card advertiser"> <!----  line red ---->
+                <div class="feature-icon">
+                       </div></div>
+
+
+
+       
+        
+ </div>
+    <script>
+        const SUPABASE_URL = "https://dpzxdwzlcrerezmloidk.supabase.co";
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRwenhkd3psY3JlcmV6bWxvaWRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2NjIxNTksImV4cCI6MjA3OTIzODE1OX0.ls_1EaTrSDpgsiKzInPncJe7myMRkHFY71HiozKqxIY";
+
+        
+           
+           
+           
+
+function carregarInfo(tipo) {
+
+    if (tipo === "membro") {
+        document.getElementById("texto-membro").innerHTML =
+            "Usuários ganham por visualizar anúncios, estatísticas ao vivo, bônus diários e sistema de level-up.";
+    }
+
+
+if (tipo === "anunciante") {
+    // Muda o texto (opcional)
+    document.getElementById("texto-anunciante").innerHTML =
+        "Promova seus produtos com alto alcance, cliques reais, controle total e relatórios detalhados.";
+
+    // Abre o link em nova aba
+    window.open("https://website-gamma-sepia-65.vercel.app/index.html", "_blank");
+    }
+
+    if (tipo === "sobre") {
+        document.getElementById("texto-sobre").innerHTML =
+            "FakeBook ";
+       window.open("https://fakebook-orpin.vercel.app/", "_blank");
+    }
+}
+
+
+
+
+// Adicionando interatividade aos botões
+        document.querySelector('.btn-primary').addEventListener('click', function() {
+            alert('Ótima escolha! Redirecionando para o formulário de registro...');
+        });
+        
+        document.querySelector('.btn-secondary').addEventListener('click', function() {
+            alert('Redirecionando para a página de login...');
+        });
+        
+        // Adicionando efeito de contador de ganhos
+        const highlight = document.querySelector('.highlight');
+        let seconds = 0;
+        
+        setInterval(() => {
+            seconds += 30;
+            const earnings = (seconds / 30) * 0.01; // R$0.01 a cada 30 segundos
+            highlight.innerHTML = `Agora você pode ganhar dinheiro apenas visualizando anúncios. <br><small>Exemplo: em ${seconds} segundos você poderia ter ganho R$${earnings.toFixed(2)}</small>`;
+        }, 30000); // Atualiza a cada 30 segundos
+   
+
+
+
+        
+function OpenInfos1() {
+    const conteudo = `
+        <h2>CICLONE PTC</h2>
+        <p>Pagamos R$ 0,0001 por click</p>
+        <p>A conta Free nao paga</p>
+        <p>A conta Pro paga por chave PIX</p>
+        <p>O upgrade da conta e R$ 15,00</p>
+        <p>Pagamos R$ 0,0001 por click</p>
+        <p>Tu vota no produto de 0 ate 9</p>
+        <p>produtos ficam com status da qualidade</p>
+        <p>conforme as notas</p>
+        <p>Pagamos R$ 0,0001 por click</p>
+        <p>Duvidas veja nosso FÓRUM</p>
+
+        <p>
+            <a href="https://eike-bat.vercel.app" target="_blank">
+                Nosso FORUM
+            </a>
+        </p>
+        <p>O Upgrade pode ser feito pelo whatsapp 21 999102951</p>
+        <p>Pagamos R$ 0,0001 por click</p>
+
+        <p>
+            <a href="https://eike-bat.vercel.app" target="_blank">
+                Nosso FORUM
+            </a>
+        </p>
+
+        <p>Este PTC e o unico que paga</p>
+        <p>Nao perca tempo com outros</p>
+        <p>Receba na tua chave pix</p>
+        <p>Tua renda extra nas horas vagas</p>
+        <p>Pagamos R$ 0,0001 por click</p>
+        <p>Ganhe para AVALIAR produtos e servicos</p>
+        <p>Teu voto de 0 a 9 e muito importante</p>
+        <p>atesta a qualidade da marca</p>
+        <p>Participe do nosso FORUM</p>
+
+        <p>
+         <a href="https://messages-group.vercel.app" target="_blank">
+                Nosso FORUM
+            </a>
+        </p>
+    `;
+
+    document.getElementById("infosBox").innerHTML = conteudo;
+}
+</script>
+   
+</body>
+</html>
