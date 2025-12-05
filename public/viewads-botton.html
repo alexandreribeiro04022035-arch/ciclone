@@ -194,45 +194,6 @@ async function loadAds() {
 
 
 
-
-    
-/* async function loadAds() {
-    try {
-        // BUSCA ANÚNCIOS DA TABELA
-        const resposta = await fetch('https://ciclone-62mq.onrender.com/api/anuncios');
-        const dados = await resposta.json();
-        
-        if (dados.success) {
-            const ads = dados.anuncios; // ANÚNCIOS REAIS DO BANCO
-            const adsList = document.getElementById("adsList");
-            adsList.innerHTML = "";
-
-            ads.forEach(ad => {
-                const box = document.createElement("div");
-                box.className = "ad-box";
-                box.onclick = () => openAd(ad.id); // ID REAL DA TABELA
-
-                box.innerHTML = `
-                    <div class="ad-title">${ad.titulo}</div>
-                    <div class="ad-desc">${ad.descricao}</div>
-                    <div class="ad-footer">${ad.tempo_exibicao} seg</div>
-                `;
-
-                adsList.appendChild(box);
-            });
-        }
-    } catch (erro) {
-        console.log('Erro ao carregar anúncios:', erro);
-    }
-    }
-*/
-
-
-
-
-
-
-
     
 function openAd(id) {
     // VAI PARA VIEWAD-BOTTON.HTML COM ID DO ANÚNCIO
