@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login - PTC System</title>
+<style>
+    body { background: #e8edf2; margin: 0; font-family: Arial, sans-serif; }
+    .login-box { width: 340px; margin: 90px auto; background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 0 12px rgba(0,0,0,0.15); }
+    h2 { text-align: center; margin-bottom: 25px; }
+    input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #b8c2cc; border-radius: 5px; font-size: 15px; }
+    button { width: 100%; background: #0d6efd; color: white; padding: 12px; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; margin-top: 10px; }
+    
+    button:hover { background: #0b5ed7; }
+    .link { text-align: center; margin-top: 12px; font-size: 14px; }
+    .link a { color: #0d6efd; text-decoration: none; font-weight: bold; }
+</style>
+</head>
+<body>
+
+<div class="login-box">
+    <h2>Login</h2>
+    <input type="email" id="email" placeholder="Seu e-mail">
+    <input type="password" id="senha" placeholder="Sua senha">
+    <button onclick="fazerLogin()">Entrar</button>
+
+    <div class="link">
+        Não tem conta? <a href="register.html">Registrar</a>
+    </div>
+    
+    <div class='link' ><a href="index.html">VOLTAR</a></div>
+</div>
+
+<script>
+async function fazerLogin() {
+    const email = document.getElementById('email').value.trim();
+    const senha = document.getElementById('senha').value.trim();
+
+    if (!email || !senha) {
+        alert('Preencha e-mail e senha!');
+        return;
+    }
+
+    try {
+        // CONSULTA DIRETO NA TABELA CADASTRO
+    const resposta = await fetch('https://ciclone-62mq.onrender.com/api/login-completo', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ email, senha })
+});
+        
+        /*  const resposta = await fetch('https://ciclone-62mq.onrender.com/api/login-direct', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                email: email, 
+                senha: senha 
+            })
+        });   */
+
+        const dados = await resposta.json();
+
+        if (dados.success) {
+            // SALVA OS DADOS REAIS DA TABELA
+            localStorage.setItem('user', JSON.stringify(dados.user));
+            alert('Login realizado com sucesso!');
+            window.location.href = 'dashboard.html';
+        } else {
+            alert('ERRO: ' + dados.error);
+        }
+    } catch (erro) {
+        alert('Erro de conexão: ' + erro.message);
+    }
+}
+</script>
+
+</body>
+</html>
