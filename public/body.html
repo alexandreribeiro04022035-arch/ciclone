@@ -146,7 +146,53 @@
             font-size: 14px;
         }
     
+/* CONTAINER DO LOGO E MENU */
+.header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0;
+}
 
+.menu a {
+    margin-left: 25px;
+    text-decoration: none;
+    color: #444;
+    font-weight: bold;
+}
+
+.menu a:hover {
+    color: #000;
+}
+
+.logo {
+    font-size: 26px;
+    font-weight: bold;
+    color: #0099ff;
+}
+
+/* BARRA DESLIZANTE (AGORA ABAIXO) */
+.marquee-box {
+    background: #012d5c;
+    color: white;
+    padding: 6px 0;
+    overflow: hidden;
+    white-space: nowrap;
+    font-size: 14px;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.marquee {
+    display: inline-block;
+    animation: slide 20s linear infinite;
+}
+
+@keyframes slide {
+    0% { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+}
+        
 </style>
     
 </head>
