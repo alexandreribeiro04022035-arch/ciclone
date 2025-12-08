@@ -9,10 +9,11 @@
         background: #e8edf2;
         margin: 0;
         font-family: Arial, sans-serif;
+        padding: 20px;
     }
     .container {
-        width: 500px;
-        margin: 60px auto;
+        max-width: 500px;
+        margin: 20px auto;
         background: #fff;
         padding: 25px;
         border-radius: 8px;
@@ -21,6 +22,7 @@
     h2 {
         text-align: center;
         margin-bottom: 25px;
+        color: #333;
     }
     input, textarea {
         width: 100%;
@@ -31,6 +33,11 @@
         font-size: 15px;
         box-sizing: border-box;
     }
+    input:focus, textarea:focus {
+        border-color: #198754;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(25, 135, 84, 0.1);
+    }
     textarea {
         height: 80px;
         resize: vertical;
@@ -39,19 +46,24 @@
         width: 100%;
         background: #198754;
         color: white;
-        padding: 12px;
+        padding: 14px;
         border: none;
         border-radius: 5px;
         font-size: 16px;
         cursor: pointer;
-        margin-top: 10px;
+        margin-top: 15px;
+        font-weight: bold;
     }
     button:hover {
         background: #157347;
     }
+    button:disabled {
+        background: #6c757d;
+        cursor: not-allowed;
+    }
     .link {
         text-align: center;
-        margin-top: 12px;
+        margin-top: 15px;
         font-size: 14px;
     }
     .link a {
@@ -59,82 +71,160 @@
         text-decoration: none;
         font-weight: bold;
     }
+    .link a:hover {
+        text-decoration: underline;
+    }
+    #resultado {
+        margin-top: 15px;
+        padding: 12px;
+        border-radius: 5px;
+        text-align: center;
+        font-weight: bold;
+        display: none;
+    }
+    .success {
+        background: #d1e7dd;
+        color: #0f5132;
+        border: 1px solid #badbcc;
+        display: block;
+    }
+    .error {
+        background: #f8d7da;
+        color: #842029;
+        border: 1px solid #f5c2c7;
+        display: block;
+    }
 </style>
 </head>
-<body onload="verificarLogin()">
+<body>
 
 <div class="container">
-    <h2>Criar Novo Anúncio</h2>
+    <h2>🚀 CRIAR ANÚNCIO</h2>
 
-    <input type="text" id="titulo" placeholder="Título do anúncio">
-    <input type="url" id="banner_url" placeholder="URL do banner (imagem)">
-    <input type="url" id="link_anuncio" placeholder="URL do anúncio (link de destino)">
-    <input type="number" id="tempo_exibicao" placeholder="Tempo de exibição (segundos)" value="30">
+    <input type="text" id="titulo" placeholder="Título do anúncio *" required>
+    <input type="url" id="banner_url" placeholder="URL do banner (imagem) *" required>
+    <input type="url" id="link_anuncio" placeholder="URL do anúncio (link de destino) *" required>
+    <input type="number" id="tempo_exibicao" placeholder="Tempo de exibição (segundos)" value="30" min="5" max="300">
     
-    <button onclick="criarAnuncio()">Criar Anúncio</button>
+    <button onclick="criarAnuncio()" id="btnCriar">CRIAR ANÚNCIO AGORA</button>
 
     <div class="link">
-        <a href="dashboard-botton.html">Voltar ao Dashboard</a>
+        <a href="dashboard-botton.html">← Voltar ao Dashboard</a>
     </div>
     
-    <div id="resultado" style="margin-top: 15px; text-align: center;"></div>
+    <div id="resultado"></div>
 </div>
 
 <script>
-/* function verificarLogin() {
-    const user = JSON.parse(localStorage.getItem('user'));
-    if (!user) {
-        window.location.href = 'login-top.html';
-        return;
-    }
-} */
+// SUA API JÁ EXISTENTE
+const API_URL = 'https://ciclone-62mq.onrender.com/api/anuncios';
 
 async function criarAnuncio() {
+    // Pegar valores
     const titulo = document.getElementById('titulo').value.trim();
     const banner_url = document.getElementById('banner_url').value.trim();
     const link_anuncio = document.getElementById('link_anuncio').value.trim();
-    const tempo_exibicao = document.getElementById('tempo_exibicao').value.trim();
-
-    if (!titulo || !banner_url || !link_anuncio || !tempo_exibicao) {
-        mostrarResultado('Preencha todos os campos!', 'error');
+    const tempo_exibicao = document.getElementById('tempo_exibicao').value.trim() || '30';
+    
+    // Validação simples
+    if (!titulo || !banner_url || !link_anuncio) {
+        mostrarResultado('⚠️ Preencha todos os campos obrigatórios!', 'error');
         return;
     }
-
+    
+    // Desabilitar botão
+    const botao = document.getElementById('btnCriar');
+    const textoOriginal = botao.textContent;
+    botao.textContent = 'Criando...';
+    botao.disabled = true;
+    
     try {
-        const resposta = await fetch('https://ciclone-62mq.onrender.com/api/anuncios', {
+        // Fazer requisição para SUA API
+        const resposta = await fetch(API_URL, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json'
+            },
             body: JSON.stringify({
                 titulo: titulo,
                 banner_url: banner_url,
                 link_anuncio: link_anuncio,
-                tempo_exibicao: parseInt(tempo_exibicao)
+                tempo_exibicao: parseInt(tempo_exibicao),
+                ativo: true,  // Adiciona campo da tabela
+                data_criacao: new Date().toISOString()  // Adiciona campo da tabela
             })
         });
-
+        
+        // Verificar se resposta é JSON
+        const contentType = resposta.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            const texto = await resposta.text();
+            throw new Error(`Resposta não é JSON: ${texto.substring(0, 100)}`);
+        }
+        
         const dados = await resposta.json();
-
+        
         if (dados.success) {
-            mostrarResultado('✅ Anúncio criado com sucesso!', 'success');
-            // Limpa os campos
+            // ✅ SUCESSO - Anúncio criado na tabela 'anuncios'
+            mostrarResultado(`✅ Anúncio criado com sucesso! ID: ${dados.id || 'OK'}`, 'success');
+            
+            // Opcional: Registrar uma view automática na tabela 'views_anuncios'
+            if (dados.id) {
+                try {
+                    await fetch('https://ciclone-62mq.onrender.com/api/views-anuncios', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            anuncio_id: dados.id,
+                            email: 'sistema@ciclone.com',
+                            creditado: true
+                        })
+                    });
+                    console.log('View registrada na tabela views_anuncios');
+                } catch (viewError) {
+                    console.log('View não registrada:', viewError);
+                }
+            }
+            
+            // Limpar campos
             document.getElementById('titulo').value = '';
             document.getElementById('banner_url').value = '';
             document.getElementById('link_anuncio').value = '';
             document.getElementById('tempo_exibicao').value = '30';
+            
         } else {
-            mostrarResultado('Erro: ' + dados.error, 'error');
+            mostrarResultado(`❌ Erro: ${dados.error || 'Erro desconhecido'}`, 'error');
         }
+        
     } catch (erro) {
-        mostrarResultado('Erro de conexão: ' + erro.message, 'error');
+        console.error('Erro completo:', erro);
+        mostrarResultado(`❌ Erro: ${erro.message}`, 'error');
+    } finally {
+        // Restaurar botão
+        botao.textContent = textoOriginal;
+        botao.disabled = false;
     }
 }
 
 function mostrarResultado(mensagem, tipo) {
     const resultado = document.getElementById('resultado');
-    resultado.innerHTML = mensagem;
-    resultado.style.color = tipo === 'success' ? '#198754' : '#dc3545';
-    resultado.style.fontWeight = 'bold';
+    resultado.textContent = mensagem;
+    resultado.className = tipo;
+    
+    // Auto-esconder depois de 5 segundos
+    setTimeout(() => {
+        resultado.textContent = '';
+        resultado.className = '';
+        resultado.style.display = 'none';
+    }, 5000);
 }
+
+// Criar com Enter
+document.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        criarAnuncio();
+    }
+});
 </script>
 
 </body>
