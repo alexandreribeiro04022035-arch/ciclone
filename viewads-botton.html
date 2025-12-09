@@ -5,10 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ver Anúncios - PTC</title>
 
-<!-- ADICIONANDO FONT AWESOME -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <style>
+    /* SEU AWESOME EXATO - SÓ ISSO */
+    .images:before {
+        content: "\f302";
+        font-size: 40px;
+        color: #6c757d;
+    }
+    
     body {
         font-family: Arial, sans-serif;
         background: #f5f6f7;
@@ -107,17 +113,6 @@
         font-family: monospace;
         border: 1px solid #eee;
     }
-
-    /* ESTILO DO AWESOME PARA ERRO DE IMAGEM */
-    .error-awesome::before {
-        content: "\f302";
-        font-family: "Font Awesome 6 Free";
-        font-weight: 900;
-        font-size: 40px;
-        color: #dc3545;
-        display: block;
-        margin-bottom: 10px;
-    }
 </style>
 
 </head>
@@ -154,16 +149,12 @@ async function loadAds() {
         const resposta = await fetch('https://ciclone-62mq.onrender.com/api/anuncios');
         const dados = await resposta.json();
         
-        console.log('📦 Dados completos da API:', dados);
-        
         if (dados.success) {
             const ads = dados.anuncios;
             const adsList = document.getElementById("adsList");
             adsList.innerHTML = "";
 
             ads.forEach(ad => {
-                console.log('🔍 Anúncio carregado:', ad);
-                
                 const box = document.createElement("div");
                 box.className = "ad-box";
                 box.onclick = () => openAd(ad.id);
@@ -176,22 +167,20 @@ async function loadAds() {
                                 ad.banner_url.includes('.webp'));
 
                 box.innerHTML = `
-                    <!-- IMAGEM DO BANNER (EM CIMA) -->
-                    <div style="height: 90px; overflow: hidden; border-radius: 5px; margin-bottom: 8px; background: #f8f9fa;">
+                    <!-- ÁREA DA IMAGEM - SÓ <i class="images"></i> QUANDO DER ERRO -->
+                    <div style="height: 90px; overflow: hidden; border-radius: 5px; margin-bottom: 8px; background: #f8f9fa; display: flex; align-items: center; justify-content: center;">
                         ${ad.banner_url && isImage ? 
                             `<img src="${ad.banner_url}" 
                                   style="width: 100%; height: 100%; object-fit: cover;"
-                                  alt="${ad.titulo}"
-                                  onerror="this.parentElement.className='error-awesome'; this.parentElement.innerHTML='❌ Erro ao carregar imagem'; this.parentElement.style.padding='20px 10px'; this.parentElement.style.textAlign='center'; this.parentElement.style.color='#999';">` 
-                            : '<div class="error-awesome" style="padding: 20px 10px; text-align: center; color: #999;">Não é imagem</div>'
+                                  alt=""
+                                  onerror="this.parentElement.innerHTML='<i class=\"images\"></i>';">` 
+                            : '<i class="images"></i>'
                         }
                     </div>
                     
-                    <!-- TÍTULO E DESCRIÇÃO -->
                     <div class="ad-title">${ad.titulo || 'Sem título'}</div>
                     <div class="ad-desc">${ad.descricao || 'Sem descrição'}</div>
                     
-                    <!-- URL VISÍVEL (EM BAIXO) -->
                     ${ad.banner_url ? 
                         `<div class="url-info" title="${ad.banner_url}">
                          🔗 ${ad.banner_url.length > 35 ? ad.banner_url.substring(0, 35) + '...' : ad.banner_url}
@@ -200,7 +189,6 @@ async function loadAds() {
                         : '<div class="url-info">❌ Sem URL</div>'
                     }
                     
-                    <!-- TEMPO -->
                     <div class="ad-footer">${ad.tempo_exibicao || 30} seg</div>
                 `;
 
