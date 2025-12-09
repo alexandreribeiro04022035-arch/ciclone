@@ -126,9 +126,28 @@ async function criarAnuncio() {
     const link_anuncio = document.getElementById('link_anuncio').value.trim();
     const tempo_exibicao = document.getElementById('tempo_exibicao').value.trim() || '30';
     
-    // Validação simples
-    if (!titulo || !banner_url || !link_anuncio) {
-        mostrarResultado('⚠️ Preencha todos os campos obrigatórios!', 'error');
+    // Validação
+    if (!titulo) {
+        mostrarResultado('❌ Digite um título para o anúncio', 'error');
+        document.getElementById('titulo').focus();
+        return;
+    }
+    
+    if (!banner_url) {
+        mostrarResultado('❌ Digite a URL do banner', 'error');
+        document.getElementById('banner_url').focus();
+        return;
+    }
+    
+    if (!link_anuncio) {
+        mostrarResultado('❌ Digite a URL de destino', 'error');
+        document.getElementById('link_anuncio').focus();
+        return;
+    }
+    
+    if (isNaN(tempo_exibicao) || tempo_exibicao < 5 || tempo_exibicao > 300) {
+        mostrarResultado('❌ Tempo deve ser entre 5 e 300 segundos', 'error');
+        document.getElementById('tempo_exibicao').focus();
         return;
     }
     
@@ -139,66 +158,77 @@ async function criarAnuncio() {
     botao.disabled = true;
     
     try {
-        // Fazer requisição para SUA API
+        // CORPO CORRETO PARA A TABELA anuncios
+        const corpoRequisicao = {
+            titulo: titulo,
+            banner_url: banner_url,
+            link_anuncio: link_anuncio,
+            tempo_exibicao: parseInt(tempo_exibicao),
+            ativo: true
+            // NÃO envia data_criacao - banco já coloca
+        };
+        
+        console.log('Enviando para API:', corpoRequisicao);
+        
+        // Fazer requisição
         const resposta = await fetch(API_URL, {
             method: 'POST',
             headers: { 
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-                titulo: titulo,
-                banner_url: banner_url,
-                link_anuncio: link_anuncio,
-                tempo_exibicao: parseInt(tempo_exibicao),
-                ativo: true,  // Adiciona campo da tabela
-                data_criacao: new Date().toISOString()  // Adiciona campo da tabela
-            })
+            body: JSON.stringify(corpoRequisicao)
         });
         
-        // Verificar se resposta é JSON
-        const contentType = resposta.headers.get('content-type');
-        if (!contentType || !contentType.includes('application/json')) {
-            const texto = await resposta.text();
-            throw new Error(`Resposta não é JSON: ${texto.substring(0, 100)}`);
+        // Verificar status
+        if (!resposta.ok) {
+            throw new Error(`HTTP ${resposta.status}: ${resposta.statusText}`);
         }
         
-        const dados = await resposta.json();
+        // Tentar parsear JSON
+        let dados;
+        try {
+            dados = await resposta.json();
+        } catch (e) {
+            const texto = await resposta.text();
+            throw new Error(`Resposta não é JSON válido: ${texto.substring(0, 100)}`);
+        }
         
+        // Verificar resposta da API
         if (dados.success) {
-            // ✅ SUCESSO - Anúncio criado na tabela 'anuncios'
-            mostrarResultado(`✅ Anúncio criado com sucesso! ID: ${dados.id || 'OK'}`, 'success');
+            mostrarResultado(`✅ Anúncio criado com sucesso! ID: ${dados.id || 'N/A'}`, 'success');
             
-            // Opcional: Registrar uma view automática na tabela 'views_anuncios'
-            if (dados.id) {
-                try {
-                    await fetch('https://ciclone-62mq.onrender.com/api/views-anuncios', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            anuncio_id: dados.id,
-                            email: 'sistema@ciclone.com',
-                            creditado: true
-                        })
-                    });
-                    console.log('View registrada na tabela views_anuncios');
-                } catch (viewError) {
-                    console.log('View não registrada:', viewError);
-                }
-            }
-            
-            // Limpar campos
-            document.getElementById('titulo').value = '';
-            document.getElementById('banner_url').value = '';
-            document.getElementById('link_anuncio').value = '';
-            document.getElementById('tempo_exibicao').value = '30';
+            // Limpar campos após 2 segundos
+            setTimeout(() => {
+                document.getElementById('titulo').value = '';
+                document.getElementById('banner_url').value = '';
+                document.getElementById('link_anuncio').value = '';
+                document.getElementById('tempo_exibicao').value = '30';
+            }, 2000);
             
         } else {
-            mostrarResultado(`❌ Erro: ${dados.error || 'Erro desconhecido'}`, 'error');
+            // Erro específico da API
+            const erroMsg = dados.error || dados.message || 'Erro desconhecido na API';
+            throw new Error(erroMsg);
         }
         
     } catch (erro) {
         console.error('Erro completo:', erro);
-        mostrarResultado(`❌ Erro: ${erro.message}`, 'error');
+        
+        // Mensagens amigáveis
+        let mensagemErro = erro.message;
+        
+        if (erro.message.includes('Failed to fetch')) {
+            mensagemErro = '❌ Não foi possível conectar ao servidor. Verifique sua conexão.';
+        } else if (erro.message.includes('HTTP 404')) {
+            mensagemErro = '❌ Endpoint da API não encontrado.';
+        } else if (erro.message.includes('HTTP 500')) {
+            mensagemErro = '❌ Erro interno no servidor.';
+        } else if (erro.message.includes('JSON')) {
+            mensagemErro = '❌ Resposta inválida do servidor.';
+        }
+        
+        mostrarResultado(mensagemErro, 'error');
+        
     } finally {
         // Restaurar botão
         botao.textContent = textoOriginal;
@@ -210,11 +240,10 @@ function mostrarResultado(mensagem, tipo) {
     const resultado = document.getElementById('resultado');
     resultado.textContent = mensagem;
     resultado.className = tipo;
+    resultado.style.display = 'block';
     
     // Auto-esconder depois de 5 segundos
     setTimeout(() => {
-        resultado.textContent = '';
-        resultado.className = '';
         resultado.style.display = 'none';
     }, 5000);
 }
@@ -225,6 +254,9 @@ document.addEventListener('keypress', function(e) {
         criarAnuncio();
     }
 });
+
+// Teste rápido da API
+console.log('Script carregado. API URL:', API_URL);
 </script>
 
 </body>
