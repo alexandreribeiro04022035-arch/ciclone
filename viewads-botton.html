@@ -136,6 +136,79 @@
     .banner-placeholder .text {
         font-size: 11px;
     }
+
+    /* Estilos para mensagens de erro */
+    .error-message {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 40px;
+        color: #dc3545;
+        background: #fff;
+        border-radius: 8px;
+        border: 2px solid #dc3545;
+    }
+
+    .error-icon {
+        font-size: 48px;
+        margin-bottom: 10px;
+    }
+
+    .retry-btn {
+        margin-top: 15px;
+        padding: 8px 20px;
+        background: #0d6efd;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: background 0.3s;
+    }
+
+    .retry-btn:hover {
+        background: #0b5ed7;
+    }
+
+    .no-ads-message {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 40px;
+        color: #6c757d;
+        background: #fff;
+        border-radius: 8px;
+        border: 2px solid #dee2e6;
+    }
+
+    .loading-spinner {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 40px;
+        color: #0d6efd;
+    }
+
+    .spinner {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #0d6efd;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 15px;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    /* Contador de recarregamento */
+    .cache-info {
+        font-size: 11px;
+        color: #6c757d;
+        text-align: center;
+        margin-top: 5px;
+        font-style: italic;
+    }
 </style>
 
 </head>
@@ -147,12 +220,34 @@
 
 <div class="container">
     <h2>Anúncios Disponíveis</h2>
-    <a href="dashboard.html">VOLTAR</a>
+    <a href="dashboard.html" style="display: inline-block; margin-bottom: 15px; color: #0d6efd; text-decoration: none; font-weight: bold;">
+        ← VOLTAR AO PAINEL
+    </a>
     
-    <div class="ad-grid" id="adsList"></div>
+    <div class="ad-grid" id="adsList">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p>Carregando anúncios...</p>
+        </div>
+    </div>
 </div>
 
 <script>
+// Cache Killer - Gera um ID único por sessão
+const CACHE_BUSTER = {
+    id: Date.now() + '-' + Math.random().toString(36).substr(2, 9),
+    getTimestamp: () => Date.now(),
+    version: 1
+};
+
+// Contador de tentativas
+let reloadAttempts = 0;
+const MAX_RELOAD_ATTEMPTS = 3;
+
+// Cache para URLs já tentadas
+const failedImageCache = new Map();
+const retryDelays = [1000, 3000, 5000]; // Delays para retentativas
+
 function loadUserAndAds() {
     const user = JSON.parse(localStorage.getItem('user'));
     
@@ -167,50 +262,147 @@ function loadUserAndAds() {
     loadAds();
 }
 
+// Função para carregar imagem COM CACHE BUSTER
+function loadImageWithCacheBuster(imgElement, imageUrl, adId) {
+    if (!imageUrl) {
+        handleBannerError(imgElement, 'URL inválida');
+        return;
+    }
+
+    // Verifica se esta URL já falhou recentemente
+    if (failedImageCache.has(imageUrl)) {
+        const lastAttempt = failedImageCache.get(imageUrl);
+        if (Date.now() - lastAttempt < 30000) { // 30 segundos de cooldown
+            handleBannerError(imgElement, 'Cache bloqueado');
+            return;
+        }
+    }
+
+    // Cria URL com cache buster
+    const cacheBustUrl = new URL(imageUrl);
+    
+    // Adiciona múltiplos parâmetros anti-cache
+    cacheBustUrl.searchParams.append('t', CACHE_BUSTER.getTimestamp());
+    cacheBustUrl.searchParams.append('v', CACHE_BUSTER.version);
+    cacheBustUrl.searchParams.append('r', Math.random().toString(36).substr(2, 8));
+    cacheBustUrl.searchParams.append('session', CACHE_BUSTER.id);
+    
+    // Adiciona adId para tracking
+    cacheBustUrl.searchParams.append('ad', adId || 'unknown');
+
+    imgElement.src = cacheBustUrl.toString();
+    imgElement.dataset.originalUrl = imageUrl;
+    imgElement.dataset.loadAttempts = 0;
+}
+
 // Função para tratar erro de carregamento do banner
-function handleBannerError(imgElement) {
+function handleBannerError(imgElement, reason = 'Erro no carregamento') {
     const container = imgElement.parentElement;
-    container.innerHTML = `
-        <div class="banner-placeholder">
-            <div class="icon">📄</div>
-            <div class="text">Banner não carregado</div>
-        </div>
-    `;
+    const originalUrl = imgElement.dataset.originalUrl;
+    
+    // Registra falha no cache
+    if (originalUrl) {
+        failedImageCache.set(originalUrl, Date.now());
+    }
+
+    const attempts = parseInt(imgElement.dataset.loadAttempts || 0) + 1;
+    
+    if (attempts < MAX_RELOAD_ATTEMPTS) {
+        // Tenta recarregar com delay
+        imgElement.dataset.loadAttempts = attempts;
+        
+        setTimeout(() => {
+            if (originalUrl) {
+                loadImageWithCacheBuster(imgElement, originalUrl);
+            }
+        }, retryDelays[attempts - 1]);
+        
+        // Mostra mensagem de tentativa
+        container.innerHTML = `
+            <div class="banner-placeholder">
+                <div class="icon">🔄</div>
+                <div class="text">Tentativa ${attempts}/${MAX_RELOAD_ATTEMPTS}</div>
+                <div class="cache-info">${reason}</div>
+            </div>
+        `;
+    } else {
+        // Esgotou tentativas
+        container.innerHTML = `
+            <div class="banner-placeholder">
+                <div class="icon">📄</div>
+                <div class="text">Banner indisponível</div>
+                <div class="cache-info">${reason}</div>
+            </div>
+        `;
+    }
+}
+
+// Função para forçar limpeza de cache
+function forceCacheClear() {
+    CACHE_BUSTER.version++;
+    CACHE_BUSTER.id = Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+    failedImageCache.clear();
+    reloadAttempts = 0;
+    
+    // Recarrega todas as imagens
+    document.querySelectorAll('.banner-container img').forEach(img => {
+        if (img.dataset.originalUrl) {
+            loadImageWithCacheBuster(img, img.dataset.originalUrl);
+        }
+    });
+    
+    console.log('🔄 Cache limpo forçadamente', CACHE_BUSTER);
 }
 
 async function loadAds() {
+    const adsList = document.getElementById("adsList");
+    
     try {
-        const resposta = await fetch('https://ciclone-62mq.onrender.com/api/anuncios');
+        // Adiciona cache buster à chamada da API também
+        const timestamp = CACHE_BUSTER.getTimestamp();
+        const apiUrl = `https://ciclone-62mq.onrender.com/api/anuncios?t=${timestamp}&v=${CACHE_BUSTER.version}&r=${Math.random().toString(36).substr(2, 8)}`;
+        
+        console.log('🌐 Buscando anúncios com cache buster:', { timestamp, version: CACHE_BUSTER.version });
+        
+        const resposta = await fetch(apiUrl, {
+            headers: {
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache'
+            }
+        });
         
         if (!resposta.ok) {
-            throw new Error(`Erro na API: ${resposta.status}`);
+            throw new Error(`Erro ${resposta.status}: ${resposta.statusText}`);
         }
         
         const dados = await resposta.json();
         
-        console.log('📦 Dados da API:', dados);
+        console.log('📦 Dados da API recebidos:', dados);
         
         if (dados.success) {
             const ads = dados.anuncios;
-            const adsList = document.getElementById("adsList");
             adsList.innerHTML = "";
 
             if (ads.length === 0) {
                 adsList.innerHTML = `
-                    <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #6c757d;">
+                    <div class="no-ads-message">
                         <div style="font-size: 48px; margin-bottom: 10px;">📭</div>
                         <h3>Nenhum anúncio disponível</h3>
                         <p>Volte mais tarde para ver novos anúncios.</p>
+                        <button onclick="loadAds()" class="retry-btn">
+                            <i class="fas fa-sync-alt"></i> Atualizar
+                        </button>
                     </div>
                 `;
                 return;
             }
 
             ads.forEach(ad => {
-                console.log('🔍 Anúncio:', ad);
+                console.log('🔍 Processando anúncio:', { id: ad.id, titulo: ad.titulo });
                 
                 const box = document.createElement("div");
                 box.className = "ad-box";
+                box.dataset.adId = ad.id;
                 box.onclick = () => openAd(ad.id);
 
                 // URL curta para exibição
@@ -219,14 +411,13 @@ async function loadAds() {
                     'Sem URL';
 
                 box.innerHTML = `
-                    <!-- ÁREA DO BANNER (SEM VERIFICAÇÃO) -->
+                    <!-- ÁREA DO BANNER -->
                     <div class="banner-container">
-                    
                         ${ad.banner_url ? 
-                            `<img src="${ad.banner_url}" 
+                            `<img src="" 
                                   style="width: 100%; height: 100%; object-fit: cover;"
                                   alt="${ad.titulo || 'Banner do anúncio'}"
-                                  onerror="handleBannerError(this)">` 
+                                  onerror="handleBannerError(this, 'Falha no carregamento')">` 
                             : `<div class="banner-placeholder">
                                   <div class="icon">📄</div>
                                   <div class="text">Sem banner</div>
@@ -245,26 +436,85 @@ async function loadAds() {
                     
                     <!-- TEMPO DE VISUALIZAÇÃO -->
                     <div class="ad-footer">${ad.tempo_exibicao || 30} segundos</div>
+                    
+                    <!-- INFO DE CACHE -->
+                    <div class="cache-info">v${CACHE_BUSTER.version}</div>
                 `;
 
                 adsList.appendChild(box);
+                
+                // Carrega a imagem com cache buster após inserir no DOM
+                if (ad.banner_url) {
+                    setTimeout(() => {
+                        const img = box.querySelector('.banner-container img');
+                        if (img) {
+                            loadImageWithCacheBuster(img, ad.banner_url, ad.id);
+                        }
+                    }, 100);
+                }
             });
+
+            // Adiciona botão para forçar limpeza de cache
+            const cacheControlDiv = document.createElement("div");
+            cacheControlDiv.style.gridColumn = "1 / -1";
+            cacheControlDiv.style.textAlign = "center";
+            cacheControlDiv.style.marginTop = "20px";
+            cacheControlDiv.innerHTML = `
+                <button onclick="forceCacheClear()" class="retry-btn">
+                    <i class="fas fa-broom"></i> Limpar Cache de Imagens
+                </button>
+                <div style="font-size: 11px; color: #6c757d; margin-top: 5px;">
+                    Use se as imagens não atualizarem
+                </div>
+            `;
+            adsList.appendChild(cacheControlDiv);
+
         } else {
             throw new Error(dados.message || 'Erro ao carregar anúncios');
         }
     } catch (erro) {
-        console.error('Erro ao carregar anúncios:', erro);
-        const adsList = document.getElementById("adsList");
+        console.error('❌ Erro ao carregar anúncios:', erro);
+        
+        reloadAttempts++;
+        
+        let errorMessage = erro.message;
+        if (erro.message.includes('Failed to fetch')) {
+            errorMessage = 'Falha na conexão com o servidor';
+        } else if (erro.message.includes('404')) {
+            errorMessage = 'API não encontrada';
+        } else if (erro.message.includes('500')) {
+            errorMessage = 'Erro interno do servidor';
+        }
+        
         adsList.innerHTML = `
-            <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #dc3545;">
-                <div style="font-size: 48px; margin-bottom: 10px;">⚠️</div>
+            <div class="error-message">
+                <div class="error-icon">⚠️</div>
                 <h3>Erro ao carregar anúncios</h3>
-                <p>${erro.message}</p>
-                <button onclick="loadAds()" style="margin-top: 15px; padding: 8px 20px; background: #0d6efd; color: white; border: none; border-radius: 4px; cursor: pointer;">
-                    Tentar novamente
-                </button>
+                <p><strong>${errorMessage}</strong></p>
+                <p>Tentativa ${reloadAttempts} de ${MAX_RELOAD_ATTEMPTS}</p>
+                
+                ${reloadAttempts < MAX_RELOAD_ATTEMPTS ? 
+                    `<button onclick="loadAds()" class="retry-btn">
+                        <i class="fas fa-sync-alt"></i> Tentar novamente (${retryDelays[reloadAttempts-1]/1000}s)
+                    </button>` 
+                    : `<div style="margin-top: 15px;">
+                          <button onclick="location.reload()" class="retry-btn">
+                              <i class="fas fa-redo"></i> Recarregar página
+                          </button>
+                          <button onclick="forceCacheClear(); loadAds();" class="retry-btn" style="margin-left: 10px; background: #dc3545;">
+                              <i class="fas fa-broom"></i> Limpar cache e tentar
+                          </button>
+                       </div>`
+                }
             </div>
         `;
+        
+        // Tenta automaticamente se ainda há tentativas
+        if (reloadAttempts < MAX_RELOAD_ATTEMPTS) {
+            setTimeout(() => {
+                loadAds();
+            }, retryDelays[reloadAttempts - 1]);
+        }
     }
 }
     
@@ -273,8 +523,25 @@ function openAd(id) {
         alert('ID do anúncio inválido');
         return;
     }
-    window.location.href = `viewad-botton.html?id=${id}`;
+    // Adiciona cache buster na navegação também
+    window.location.href = `viewad-botton.html?id=${id}&t=${CACHE_BUSTER.getTimestamp()}`;
 }
+
+// Força recarregamento periódico (opcional)
+setInterval(() => {
+    if (document.visibilityState === 'visible') {
+        console.log('🔄 Recarregamento periódico de imagens');
+        forceCacheClear();
+    }
+}, 300000); // 5 minutos
+
+// Inicializa quando a página volta ao foco
+document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) {
+        console.log('📱 Página voltou ao foco, verificando atualizações...');
+        loadAds();
+    }
+});
 </script>
 
 </body>
