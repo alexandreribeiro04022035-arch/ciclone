@@ -4,7 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ver Anúncios - PTC</title>
-
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    
 <style>
     body {
         font-family: Arial, sans-serif;
@@ -104,6 +105,14 @@
         font-family: monospace;
         border: 1px solid #eee;
     }
+
+
+  .images {
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+  color: red;
+ } .images:before { content: "\f302"; }
+    
 </style>
 
 </head>
@@ -169,7 +178,7 @@ async function loadAds() {
                             `<img src="${ad.banner_url}" 
                                   style="width: 100%; height: 100%; object-fit: cover;"
                                   alt="${ad.titulo}"
-                                  onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=\\'padding: 30px 10px; text-align: center; color: #999;\\'>❌ Erro ao carregar imagem</div>'">` 
+                                  onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=\\'padding: 30px 10px; text-align: center; color: #999;\\'>   <i class='images' ></i> </div>'">` 
                             : '<div style="padding: 30px 10px; text-align: center; color: #999;">🖼️ Não é imagem</div>'
                         }
                     </div>
