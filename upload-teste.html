@@ -682,8 +682,8 @@ async function loadImageGuaranteed(imageName, containerId) {
         
         // Gera URL do Neon correta
         function generateNeonUrl() {
-            const projectId = prompt("ID do projeto Neon (ex: ep-sparkling-hill-123456):", "");
-            const fileName = prompt("Nome do arquivo (ex: imagem.jpg):", "");
+            const projectId = prompt("plain-dew-99775801", "");
+            const fileName = prompt("ico-moveme.jpg", "");
             
             if (projectId && fileName) {
                 const neonUrl = `https://${projectId}.neon.tech/storage/v1/object/public/bucket/${fileName}`;
