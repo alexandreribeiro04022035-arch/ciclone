@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ver Anúncios - PTC</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    
+<style>
+    /* ESTILOS BASE (mantidos) */
+    body { font-family: Arial, sans-serif; background: #f5f6f7; margin: 0; padding: 0; }
+    header { background: #0d6efd; padding: 15px; color: #fff; text-align: center; font-size: 22px; font-weight: bold; }
+    .user-info { background: #198754; color: white; padding: 10px; text-align: center; font-size: 16px; font-weight: bold; }
+    .container { max-width: 900px; margin: 30px auto; padding: 10px; }
+    h2 { margin-bottom: 20px; text-align: center; }
+    .ad-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 15px; }
+    .ad-box { background: #ffffff; border: 2px solid #0d6efd; border-radius: 8px; padding: 15px; height: 210px; cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; }
+    .ad-box:hover { transform: scale(1.03); border-color: #0b5ed7; }
+    .ad-title { font-size: 14px; font-weight: bold; color: #0d6efd; margin-top: 5px; }
+    .ad-desc { font-size: 12px; color: #333; margin-top: 3px; flex-grow: 1; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+    .ad-footer { font-size: 12px; text-align: right; color: #000; font-weight: bold; }
+    .url-info { font-size: 10px; color: #666; background: #f8f9fa; padding: 4px 6px; border-radius: 3px; margin-top: 5px; word-break: break-all; font-family: monospace; border: 1px solid #eee; }
+    .banner-container { height: 90px; overflow: hidden; border-radius: 5px; margin-bottom: 8px; background: #f8f9fa; display: flex; align-items: center; justify-content: center; }
+    
+    /* NOVOS ESTILOS PARA DEBUG */
+    .debug-mode {
+        background: #fff3cd !important;
+        border-color: #ffc107 !important;
+    }
+    
+    .debug-info {
+        font-size: 9px;
+        color: #856404;
+        background: #fff3cd;
+        padding: 2px 4px;
+        border-radius: 2px;
+        margin-top: 2px;
+        border: 1px dashed #ffc107;
+    }
+    
+    .cache-status {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        background: rgba(220, 53, 69, 0.9);
+        color: white;
+        font-size: 10px;
+        padding: 1px 4px;
+        border-radius: 3px;
+        z-index: 10;
+    }
+    
+    .banner-container {
+        position: relative;
+    }
+    
+    .force-reload-btn {
+        position: absolute;
+        bottom: 5px;
+        right: 5px;
+        background: rgba(13, 110, 253, 0.9);
+        color: white;
+        border: none;
+        border-radius: 3px;
+        padding: 2px 6px;
+        font-size: 10px;
+        cursor: pointer;
+        z-index: 20;
+    }
+</style>
+
+</head>
+<body onload="initializePage();">
+
+<header>View Ads <span id="debugIndicator" style="font-size: 12px; background: #dc3545; padding: 2px 8px; border-radius: 10px; display: none;">DEBUG</span></header>
+
+<div class="user-info" id="userInfo">Carregando usuário...</div>
+
+<div class="container">
+    <h2>Anúncios Disponíveis 
+        <button onclick="toggleDebug()" style="font-size: 12px; padding: 2px 8px; background: #6c757d; color: white; border: none; border-radius: 3px; cursor: pointer;">
+            🔧 Debug
+        </button>
+    </h2>
+    <a href="dashboard.html">← VOLTAR</a>
+    
+    <!-- CONTROLES DE CACHE -->
+    <div style="background: #e9ecef; padding: 10px; border-radius: 5px; margin-bottom: 15px; border: 1px solid #dee2e6;">
+        <div style="font-size: 12px; font-weight: bold; color: #495057; margin-bottom: 5px;">Controle de Cache:</div>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <button onclick="forceClearAllCache()" style="padding: 5px 10px; background: #dc3545; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 11px;">
+                💥 Limpar TUDO
+            </button>
+            <button onclick="reloadAllImages()" style="padding: 5px 10px; background: #0d6efd; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 11px;">
+                🔄 Recarregar Imagens
+            </button>
+            <button onclick="testImageUrls()" style="padding: 5px 10px; background: #198754; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 11px;">
+                🧪 Testar URLs
+            </button>
+            <span id="cacheStats" style="font-size: 11px; color: #6c757d; margin-left: auto; align-self: center;">
+                Sessão: <span id="sessionId">...</span>
+            </span>
+        </div>
+    </div>
+    
+    <div class="ad-grid" id="adsList">
+        <div style="grid-column: 1 / -1; text-align: center; padding: 30px;">
+            <div style="font-size: 40px; color: #0d6efd; margin-bottom: 10px;">⏳</div>
+            <p>Carregando anúncios...</p>
+        </div>
+    </div>
+</div>
+
+<script>
+// ======================
+// SISTEMA ANTI-CACHE NUCLEAR
+// ======================
+
+let DEBUG_MODE = false;
+let SESSION_ID = 'sess_' + Date.now() + '_' + Math.random().toString(36).substr(2, 8);
+let CACHE_VERSION = 1;
+let API_CACHE_BREAKER = 0;
+
+// Inicialização
+function initializePage() {
+    document.getElementById('sessionId').textContent = SESSION_ID.substr(0, 8) + '...';
+    loadUserAndAds();
+    
+    // Monitora erros de imagem
+    window.addEventListener('error', function(e) {
+        if (e.target.tagName === 'IMG') {
+            console.warn('🖼️ Erro de imagem:', e.target.src);
+        }
+    }, true);
+}
+
+// Alternar modo debug
+function toggleDebug() {
+    DEBUG_MODE = !DEBUG_MODE;
+    document.getElementById('debugIndicator').style.display = DEBUG_MODE ? 'inline-block' : 'none';
+    document.querySelectorAll('.ad-box').forEach(box => {
+        box.classList.toggle('debug-mode', DEBUG_MODE);
+    });
+    console.log('🔧 Modo Debug:', DEBUG_MODE ? 'ON' : 'OFF');
+}
+
+// Funções de controle de cache
+function forceClearAllCache() {
+    CACHE_VERSION++;
+    API_CACHE_BREAKER = Date.now();
+    SESSION_ID = 'sess_' + Date.now() + '_' + Math.random().toString(36).substr(2, 8);
+    
+    // Limpa localStorage temporário
+    Object.keys(localStorage).forEach(key => {
+        if (key.startsWith('img_cache_')) {
+            localStorage.removeItem(key);
+        }
+    });
+    
+    // Limpa sessionStorage
+    sessionStorage.clear();
+    
+    // Força recarregamento do navegador
+    if (navigator.serviceWorker) {
+        navigator.serviceWorker.getRegistrations().then(registrations => {
+            registrations.forEach(registration => registration.unregister());
+        });
+    }
+    
+    alert(`💥 Cache limpo!\nNova sessão: ${SESSION_ID}\nVersão: ${CACHE_VERSION}`);
+    location.reload();
+}
+
+function reloadAllImages() {
+    document.querySelectorAll('.banner-container img').forEach(img => {
+        if (img.dataset.originalUrl) {
+            loadImageNuclear(img, img.dataset.originalUrl, img.dataset.adId);
+        }
+    });
+    console.log('🔄 Todas as imagens recarregadas');
+}
+
+// ======================
+// CARREGAMENTO DE USUÁRIO
+// ======================
+
+function loadUserAndAds() {
+    const user = JSON.parse(localStorage.getItem('user'));
+    
+    if (!user) {
+        window.location.href = 'login-top.html';
+        return;
+    }
+
+    document.getElementById('userInfo').textContent = 
+        `Usuário: ${user.nome} | Saldo: R$ ${parseFloat(user.saldo_redisponivel || 0).toFixed(2)}`;
+
+    loadAds();
+}
+
+// ======================
+// CARREGAMENTO DE ANÚNCIOS (API)
+// ======================
+
+async function loadAds() {
+    const adsList = document.getElementById("adsList");
+    
+    try {
+        // URL da API com MULTIPLOS cache breakers
+        const apiUrl = buildApiUrl();
+        
+        console.log('🌐 Chamando API:', apiUrl);
+        
+        const resposta = await fetch(apiUrl, {
+            method: 'GET',
+            headers: {
+                'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0',
+                'Pragma': 'no-cache',
+                'Expires': '0',
+                'X-Cache-Buster': SESSION_ID,
+                'X-Request-ID': 'req_' + Date.now(),
+                'X-Force-Refresh': 'true'
+            },
+            cache: 'no-store'
+        });
+        
+        if (!resposta.ok) {
+            throw new Error(`API ${resposta.status}: ${resposta.statusText}`);
+        }
+        
+        const dados = await resposta.json();
+        
+        if (DEBUG_MODE) {
+            console.log('📦 Resposta API BRUTA:', dados);
+            console.log('🔍 Headers:', Object.fromEntries(resposta.headers.entries()));
+        }
+        
+        if (dados.success) {
+            renderAds(dados.anuncios || []);
+        } else {
+            throw new Error(dados.message || 'API retornou erro');
+        }
+        
+    } catch (erro) {
+        console.error('❌ Erro fatal na API:', erro);
+        showApiError(erro);
+    }
+}
+
+function buildApiUrl() {
+    const baseUrl = 'https://ciclone-62mq.onrender.com/api/anuncios';
+    const params = new URLSearchParams();
+    
+    // MÚLTIPLOS parâmetros anti-cache
+    params.append('_t', Date.now());
+    params.append('_v', CACHE_VERSION);
+    params.append('_s', SESSION_ID);
+    params.append('_r', Math.random().toString(36).substr(2, 12));
+    params.append('_cb', API_CACHE_BREAKER);
+    params.append('_nocache', 'true');
+    params.append('_', Date.now());
+    
+    // Adiciona timestamp em milissegundos e nanossegundos
+    const perfNow = performance.now();
+    params.append('_perf', perfNow.toString());
+    params.append('_hr', Date.now() + '_' + Math.random());
+    
+    return `${baseUrl}?${params.toString()}`;
+}
+
+// ======================
+// RENDERIZAÇÃO DE ANÚNCIOS
+// ======================
+
+function renderAds(ads) {
+    const adsList = document.getElementById("adsList");
+    adsList.innerHTML = "";
+    
+    if (ads.length === 0) {
+        adsList.innerHTML = `
+            <div style="grid-column: 1 / -1; text-align: center; padding: 40px; background: white; border-radius: 8px; border: 2px solid #dee2e6;">
+                <div style="font-size: 48px; margin-bottom: 10px;">📭</div>
+                <h3>Nenhum anúncio disponível</h3>
+                <p>Volte mais tarde para ver novos anúncios.</p>
+            </div>
+        `;
+        return;
+    }
+    
+    ads.forEach(ad => {
+        const box = document.createElement("div");
+        box.className = "ad-box";
+        box.dataset.adId = ad.id;
+        box.onclick = () => openAd(ad.id);
+        
+        // URL curta para display
+        const shortUrl = ad.banner_url ? 
+            (ad.banner_url.length > 25 ? ad.banner_url.substring(0, 25) + '...' : ad.banner_url) : 
+            'Sem URL';
+        
+        box.innerHTML = `
+            <div class="banner-container">
+                ${ad.banner_url ? 
+                    `<img src="" 
+                          alt="${ad.titulo || 'Banner'}"
+                          data-original-url="${ad.banner_url}"
+                          data-ad-id="${ad.id}"
+                          style="width: 100%; height: 100%; object-fit: cover;"
+                          onerror="handleImageError(this)">` 
+                    : `<div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: #6c757d;">
+                          <div style="font-size: 28px; opacity: 0.5;">📄</div>
+                          <div style="font-size: 11px;">Sem banner</div>
+                       </div>`
+                }
+                ${ad.banner_url ? `<button class="force-reload-btn" onclick="reloadSingleImage(this, '${ad.id}'); event.stopPropagation();">↻</button>` : ''}
+            </div>
+            
+            <div class="ad-title">${ad.titulo || 'Sem título'}</div>
+            <div class="ad-desc">${ad.descricao || 'Sem descrição'}</div>
+            
+            <div class="url-info" title="${ad.banner_url || ''}">
+                ${ad.banner_url ? `🔗 ${shortUrl}` : '❌ Sem URL'}
+            </div>
+            
+            <div class="ad-footer">${ad.tempo_exibicao || 30}s</div>
+            
+            ${DEBUG_MODE ? `<div class="debug-info">ID: ${ad.id} | Sessão: ${SESSION_ID.substr(0, 6)}</div>` : ''}
+        `;
+        
+        adsList.appendChild(box);
+        
+        // Carrega a imagem APÓS inserir no DOM
+        if (ad.banner_url) {
+            setTimeout(() => {
+                const img = box.querySelector('img');
+                if (img) {
+                    loadImageNuclear(img, ad.banner_url, ad.id);
+                }
+            }, 50);
+        }
+    });
+}
+
+// ======================
+// CARREGAMENTO NUCLEAR DE IMAGENS
+// ======================
+
+function loadImageNuclear(imgElement, originalUrl, adId) {
+    if (!originalUrl) return;
+    
+    // Gera URL com CACHE BUSTER NUCLEAR
+    const nuclearUrl = generateNuclearUrl(originalUrl, adId);
+    
+    // Define src
+    imgElement.src = nuclearUrl;
+    imgElement.dataset.originalUrl = originalUrl;
+    imgElement.dataset.adId = adId;
+    imgElement.dataset.loadTime = Date.now();
+    
+    if (DEBUG_MODE) {
+        console.log('🖼️ Carregando imagem:', {
+            adId,
+            original: originalUrl,
+            nuclear: nuclearUrl,
+            session: SESSION_ID
+        });
+    }
+}
+
+function generateNuclearUrl(baseUrl, adId) {
+    try {
+        const url = new URL(baseUrl);
+        
+        // REMOVE qualquer query string existente (cache velho)
+        url.search = '';
+        
+        // Adiciona NOVOS parâmetros NUCLEARES
+        const params = new URLSearchParams();
+        
+        // Timestamps múltiplos
+        params.append('t', Date.now());
+        params.append('ts', performance.now().toString());
+        params.append('hr', Date.now() + '_' + process.hrtime?.[1] || Math.random());
+        
+        // Identificadores únicos
+        params.append('v', CACHE_VERSION);
+        params.append('s', SESSION_ID);
+        params.append('a', adId || 'unknown');
+        
+        // Randomização extrema
+        params.append('r1', Math.random().toString(36).substr(2, 12));
+        params.append('r2', Math.random().toString(36).substr(2, 12));
+        params.append('cb', API_CACHE_BREAKER);
+        
+        // Flags
+        params.append('nc', 'true');
+        params.append('force', '1');
+        params.append('nocache', 'true');
+        
+        // Adiciona ao URL
+        url.search = params.toString();
+        
+        return url.toString();
+        
+    } catch (e) {
+        // Se não for URL válida, adiciona parâmetros manualmente
+        const separator = baseUrl.includes('?') ? '&' : '?';
+        return `${baseUrl}${separator}t=${Date.now()}&v=${CACHE_VERSION}&s=${SESSION_ID}&r=${Math.random().toString(36).substr(2, 12)}`;
+    }
+}
+
+function handleImageError(imgElement) {
+    const originalUrl = imgElement.dataset.originalUrl;
+    const adId = imgElement.dataset.adId;
+    
+    console.warn('❌ Erro na imagem:', { adId, url: originalUrl });
+    
+    // Tenta métodos alternativos
+    setTimeout(() => {
+        if (originalUrl) {
+            // Método 1: Adiciona mais parâmetros
+            const newUrl = originalUrl + (originalUrl.includes('?') ? '&' : '?') + 
+                         `_retry=${Date.now()}_${Math.random().toString(36).substr(2, 8)}`;
+            imgElement.src = newUrl;
+            
+            // Método 2: Se ainda falhar, tenta via proxy CORS
+            setTimeout(() => {
+                if (imgElement.complete && imgElement.naturalWidth === 0) {
+                    tryImageProxy(imgElement, originalUrl, adId);
+                }
+            }, 1000);
+        }
+    }, 500);
+}
+
+function tryImageProxy(imgElement, originalUrl, adId) {
+    // Tenta via CORS proxy (alternativa)
+    const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(originalUrl)}&_proxy=${Date.now()}`;
+    imgElement.src = proxyUrl;
+    console.log('🔄 Tentando via proxy:', proxyUrl);
+}
+
+function reloadSingleImage(button, adId) {
+    const container = button.parentElement;
+    const img = container.querySelector('img');
+    
+    if (img && img.dataset.originalUrl) {
+        // Incrementa versão localmente
+        CACHE_VERSION++;
+        
+        // Recarrega com NOVOS parâmetros
+        loadImageNuclear(img, img.dataset.originalUrl, adId);
+        
+        // Feedback visual
+        button.innerHTML = '✓';
+        button.style.background = '#198754';
+        setTimeout(() => {
+            button.innerHTML = '↻';
+            button.style.background = 'rgba(13, 110, 253, 0.9)';
+        }, 1000);
+        
+        console.log('🖼️ Imagem recarregada forçadamente:', adId);
+    }
+}
+
+// ======================
+// TESTE DE URLs (DEBUG)
+// ======================
+
+async function testImageUrls() {
+    const testUrls = [
+        'https://ciclone-62mq.onrender.com/api/anuncios',
+        'https://ciclone-62mq.onrender.com/favicon.ico',
+        'https://httpbin.org/image/jpeg'
+    ];
+    
+    const results = [];
+    
+    for (const url of testUrls) {
+        try {
+            const start = Date.now();
+            const response = await fetch(url + '?test=' + Date.now());
+            const status = response.status;
+            const time = Date.now() - start;
+            results.push({ url, status, time, ok: response.ok });
+        } catch (e) {
+            results.push({ url, error: e.message });
+        }
+    }
+    
+    console.table(results);
+    alert(`🧪 Teste de URLs:\n${results.map(r => 
+        `${r.url}\nStatus: ${r.status || 'ERRO'} | Tempo: ${r.time || '-'}ms\n`
+    ).join('\n')}`);
+}
+
+// ======================
+// MANIPULAÇÃO DE ERROS
+// ======================
+
+function showApiError(erro) {
+    const adsList = document.getElementById("adsList");
+    
+    let errorMsg = erro.message;
+    let suggestion = '';
+    
+    if (erro.message.includes('Failed to fetch')) {
+        errorMsg = 'Servidor offline ou bloqueado por CORS';
+        suggestion = 'Verifique se o servidor está rodando e permite CORS';
+    } else if (erro.message.includes('404')) {
+        errorMsg = 'Endpoint da API não encontrado';
+        suggestion = 'Verifique a URL da API';
+    } else if (erro.message.includes('500')) {
+        errorMsg = 'Erro interno do servidor';
+        suggestion = 'Tente novamente em alguns instantes';
+    }
+    
+    adsList.innerHTML = `
+        <div style="grid-column: 1 / -1; text-align: center; padding: 40px; background: white; border-radius: 8px; border: 2px solid #dc3545;">
+            <div style="font-size: 48px; margin-bottom: 10px;">⚠️</div>
+            <h3 style="color: #dc3545;">Erro na API</h3>
+            <p><strong>${errorMsg}</strong></p>
+            ${suggestion ? `<p><small>${suggestion}</small></p>` : ''}
+            
+            <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: center;">
+                <button onclick="loadAds()" style="padding: 8px 16px; background: #0d6efd; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                    🔄 Tentar novamente
+                </button>
+                <button onclick="forceClearAllCache()" style="padding: 8px 16px; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                    💥 Limpar cache
+                </button>
+                <button onclick="testImageUrls()" style="padding: 8px 16px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                    🧪 Testar conexão
+                </button>
+            </div>
+            
+            <div style="margin-top: 15px; font-size: 11px; color: #6c757d; background: #f8f9fa; padding: 8px; border-radius: 4px; text-align: left; max-width: 500px; margin-left: auto; margin-right: auto;">
+                <strong>Debug Info:</strong><br>
+                Sessão: ${SESSION_ID}<br>
+                Versão: ${CACHE_VERSION}<br>
+                API Breaker: ${API_CACHE_BREAKER}<br>
+                User-Agent: ${navigator.userAgent.substr(0, 50)}...
+            </div>
+        </div>
+    `;
+}
+
+// ======================
+// FUNÇÕES AUXILIARES
+// ======================
+
+function openAd(id) {
+    if (!id) {
+        alert('ID do anúncio inválido');
+        return;
+    }
+    // Adiciona parâmetros anti-cache na navegação
+    window.location.href = `viewad-botton.html?id=${id}&_s=${SESSION_ID}&_t=${Date.now()}&_v=${CACHE_VERSION}`;
+}
+
+// ======================
+// INICIALIZAÇÃO AVANÇADA
+// ======================
+
+// Detecta Service Workers (que podem causar cache)
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then(registrations => {
+        if (registrations.length > 0) {
+            console.warn('⚠️ Service Workers encontrados (podem causar cache):', registrations.length);
+            if (DEBUG_MODE) {
+                alert(`⚠️ ${registrations.length} Service Worker(s) ativo(s). Eles podem estar causando cache.`);
+            }
+        }
+    });
+}
+
+// Detecta modo offline
+window.addEventListener('offline', () => {
+    console.warn('📴 Modo offline detectado');
+    document.getElementById('userInfo').style.background = '#dc3545';
+    document.getElementById('userInfo').textContent += ' (OFFLINE)';
+});
+
+window.addEventListener('online', () => {
+    console.log('📶 Volta ao online');
+    document.getElementById('userInfo').style.background = '#198754';
+    loadAds();
+});
+
+// Log de performance
+window.addEventListener('load', () => {
+    if (DEBUG_MODE) {
+        console.log('🚀 Página carregada em:', performance.now().toFixed(2), 'ms');
+    }
+});
+</script>
+
+</body>
+</html>
