@@ -54,7 +54,7 @@
         border: 2px solid #0d6efd;
         border-radius: 8px;
         padding: 15px;
-        height: 210px; /* Aumentado mais para URL */
+        height: 210px;
         cursor: pointer;
         transition: 0.2s;
         display: flex;
@@ -106,13 +106,26 @@
         border: 1px solid #eee;
     }
 
+    .image-placeholder {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        color: #6c757d;
+        background: #f8f9fa;
+        border-radius: 5px;
+    }
 
-  .images {
-  font-family: "Font Awesome 5 Free";
-  font-weight: 900;
-  color: red;
- } .images:before { content: "\f302"; }
-    
+    .image-placeholder .icon {
+        font-size: 24px;
+        margin-bottom: 5px;
+        opacity: 0.6;
+    }
+
+    .image-placeholder .text {
+        font-size: 11px;
+    }
 </style>
 
 </head>
@@ -144,9 +157,25 @@ function loadUserAndAds() {
     loadAds();
 }
 
+// Função para tratar erro de carregamento de imagem
+function handleImageError(imgElement) {
+    const parent = imgElement.parentElement;
+    parent.innerHTML = `
+        <div class="image-placeholder">
+            <div class="icon">🖼️</div>
+            <div class="text">Imagem não carregada</div>
+        </div>
+    `;
+}
+
 async function loadAds() {
     try {
         const resposta = await fetch('https://ciclone-62mq.onrender.com/api/anuncios');
+        
+        if (!resposta.ok) {
+            throw new Error(`Erro na API: ${resposta.status}`);
+        }
+        
         const dados = await resposta.json();
         
         console.log('📦 Dados completos da API:', dados);
@@ -155,6 +184,17 @@ async function loadAds() {
             const ads = dados.anuncios;
             const adsList = document.getElementById("adsList");
             adsList.innerHTML = "";
+
+            if (ads.length === 0) {
+                adsList.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #6c757d;">
+                        <div style="font-size: 48px; margin-bottom: 10px;">📭</div>
+                        <h3>Nenhum anúncio disponível</h3>
+                        <p>Volte mais tarde para ver novos anúncios.</p>
+                    </div>
+                `;
+                return;
+            }
 
             ads.forEach(ad => {
                 console.log('🔍 Anúncio carregado:', ad);
@@ -165,21 +205,25 @@ async function loadAds() {
 
                 // VERIFICA SE É IMAGEM
                 const isImage = ad.banner_url && 
-                               (ad.banner_url.includes('.jpg') || 
-                                ad.banner_url.includes('.png') ||
-                                ad.banner_url.includes('.jpeg') ||
-                                ad.banner_url.includes('.gif') ||
-                                ad.banner_url.includes('.webp'));
+                               /\.(jpg|jpeg|png|gif|webp|bmp)$/i.test(ad.banner_url);
+
+                // Determina ícone baseado no tipo
+                const urlIcon = isImage ? '🖼️' : '🔗';
+                const placeholderIcon = isImage ? '🖼️' : '🔗';
+                const placeholderText = isImage ? 'Sem imagem' : 'Sem banner';
 
                 box.innerHTML = `
-                    <!-- IMAGEM DO BANNER (EM CIMA) -->
+                    <!-- ÁREA DO BANNER -->
                     <div style="height: 90px; overflow: hidden; border-radius: 5px; margin-bottom: 8px; background: #f8f9fa;">
-                        ${ad.banner_url && isImage ? 
+                        ${ad.banner_url ? 
                             `<img src="${ad.banner_url}" 
                                   style="width: 100%; height: 100%; object-fit: cover;"
-                                  alt="${ad.titulo}"
-                                  onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=\\'padding: 30px 10px; text-align: center; color: #999;\\'>   <i class='images' ></i> </div>'">` 
-                            : '<div style="padding: 30px 10px; text-align: center; color: #999;">🖼️  <i class='images' ></i> </div>'
+                                  alt="${ad.titulo || 'Banner do anúncio'}"
+                                  onerror="handleImageError(this)">` 
+                            : `<div class="image-placeholder">
+                                  <div class="icon">${placeholderIcon}</div>
+                                  <div class="text">${placeholderText}</div>
+                               </div>`
                         }
                     </div>
                     
@@ -187,28 +231,44 @@ async function loadAds() {
                     <div class="ad-title">${ad.titulo || 'Sem título'}</div>
                     <div class="ad-desc">${ad.descricao || 'Sem descrição'}</div>
                     
-                    <!-- URL VISÍVEL (EM BAIXO) -->
+                    <!-- URL VISÍVEL -->
                     ${ad.banner_url ? 
                         `<div class="url-info" title="${ad.banner_url}">
-                         🔗 ${ad.banner_url.length > 35 ? ad.banner_url.substring(0, 35) + '...' : ad.banner_url}
-                         ${isImage ? '🖼️' : '🔗'}
+                         ${urlIcon} ${ad.banner_url.length > 35 ? ad.banner_url.substring(0, 35) + '...' : ad.banner_url}
                          </div>` 
                         : '<div class="url-info">❌ Sem URL</div>'
                     }
                     
-                    <!-- TEMPO -->
-                    <div class="ad-footer">${ad.tempo_exibicao || 30} seg</div>
+                    <!-- TEMPO DE VISUALIZAÇÃO -->
+                    <div class="ad-footer">${ad.tempo_exibicao || 30} segundos</div>
                 `;
 
                 adsList.appendChild(box);
             });
+        } else {
+            throw new Error(dados.message || 'Erro ao carregar anúncios');
         }
     } catch (erro) {
-        console.log('Erro ao carregar anúncios:', erro);
+        console.error('Erro ao carregar anúncios:', erro);
+        const adsList = document.getElementById("adsList");
+        adsList.innerHTML = `
+            <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #dc3545;">
+                <div style="font-size: 48px; margin-bottom: 10px;">⚠️</div>
+                <h3>Erro ao carregar anúncios</h3>
+                <p>${erro.message}</p>
+                <button onclick="loadAds()" style="margin-top: 15px; padding: 8px 20px; background: #0d6efd; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                    Tentar novamente
+                </button>
+            </div>
+        `;
     }
 }
     
 function openAd(id) {
+    if (!id) {
+        alert('ID do anúncio inválido');
+        return;
+    }
     window.location.href = `viewad-botton.html?id=${id}`;
 }
 </script>
