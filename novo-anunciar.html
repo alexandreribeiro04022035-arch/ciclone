@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Criar Anúncio - CICLONE</title>
+<style>
+    body {
+        background: #e8edf2;
+        margin: 0;
+        font-family: Arial, sans-serif;
+        padding: 20px;
+    }
+    .container {
+        max-width: 500px;
+        margin: 20px auto;
+        background: #fff;
+        padding: 25px;
+        border-radius: 8px;
+        box-shadow: 0 0 12px rgba(0,0,0,0.15);
+    }
+    h2 {
+        text-align: center;
+        margin-bottom: 25px;
+        color: #333;
+    }
+    input {
+        width: 100%;
+        padding: 12px;
+        margin: 8px 0;
+        border: 1px solid #b8c2cc;
+        border-radius: 5px;
+        font-size: 15px;
+        box-sizing: border-box;
+    }
+    input:focus {
+        border-color: #198754;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(25, 135, 84, 0.1);
+    }
+    button {
+        width: 100%;
+        background: #198754;
+        color: white;
+        padding: 14px;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+        margin-top: 15px;
+        font-weight: bold;
+    }
+    button:hover {
+        background: #157347;
+    }
+    button:disabled {
+        background: #6c757d;
+        cursor: not-allowed;
+    }
+    .link {
+        text-align: center;
+        margin-top: 15px;
+        font-size: 14px;
+    }
+    .link a {
+        color: #0d6efd;
+        text-decoration: none;
+        font-weight: bold;
+    }
+    #resultado {
+        margin-top: 15px;
+        padding: 12px;
+        border-radius: 5px;
+        text-align: center;
+        font-weight: bold;
+        display: none;
+    }
+    .success {
+        background: #d1e7dd;
+        color: #0f5132;
+        border: 1px solid #badbcc;
+        display: block;
+    }
+    .error {
+        background: #f8d7da;
+        color: #842029;
+        border: 1px solid #f5c2c7;
+        display: block;
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h2>🚀 CRIAR ANÚNCIO</h2>
+
+    <input type="text" id="titulo" placeholder="Título do anúncio *" required>
+    <input type="url" id="banner_url" placeholder="URL do banner *" required>
+    <input type="url" id="link_anuncio" placeholder="URL do anúncio *" required>
+    <input type="number" id="tempo_exibicao" placeholder="Tempo (segundos)" value="30" min="5" max="300">
+    
+    <button onclick="criarAnuncio()" id="btnCriar">CRIAR ANÚNCIO</button>
+
+    <div class="link">
+        <a href="dashboard-botton.html">← Voltar</a>
+    </div>
+    
+    <div id="resultado"></div>
+</div>
+
+<script>
+const API_URL = 'https://ciclone-62mq.onrender.com/api/anuncios';
+
+async function criarAnuncio() {
+    const titulo = document.getElementById('titulo').value.trim();
+    const banner_url = document.getElementById('banner_url').value.trim();
+    const link_anuncio = document.getElementById('link_anuncio').value.trim();
+    const tempo = document.getElementById('tempo_exibicao').value.trim() || '30';
+    
+    if (!titulo || !banner_url || !link_anuncio) {
+        mostrarResultado('❌ Preencha todos os campos', 'error');
+        return;
+    }
+    
+    const botao = document.getElementById('btnCriar');
+    const textoOriginal = botao.textContent;
+    botao.textContent = 'Criando...';
+    botao.disabled = true;
+    
+    try {
+        const resposta = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                titulo: titulo,
+                banner_url: banner_url,
+                link_anuncio: link_anuncio,
+                tempo_exibicao: parseInt(tempo),
+                ativo: true
+            })
+        });
+        
+        const texto = await resposta.text();
+        
+        if (texto.startsWith('<')) {
+            throw new Error('API retornou página de erro HTML');
+        }
+        
+        const dados = JSON.parse(texto);
+        
+        if (dados.success) {
+            mostrarResultado(`✅ Anúncio criado! ID: ${dados.id}`, 'success');
+            document.getElementById('titulo').value = '';
+            document.getElementById('banner_url').value = '';
+            document.getElementById('link_anuncio').value = '';
+            document.getElementById('tempo_exibicao').value = '30';
+        } else {
+            throw new Error(dados.error || 'Erro na API');
+        }
+        
+    } catch (erro) {
+        let msg = erro.message;
+        if (erro.message.includes('HTML')) msg = '❌ Erro no servidor. API não configurada.';
+        if (erro.message.includes('fetch')) msg = '❌ Sem conexão com servidor.';
+        mostrarResultado(msg, 'error');
+    } finally {
+        botao.textContent = textoOriginal;
+        botao.disabled = false;
+    }
+}
+
+function mostrarResultado(msg, tipo) {
+    const div = document.getElementById('resultado');
+    div.textContent = msg;
+    div.className = tipo;
+    div.style.display = 'block';
+    setTimeout(() => div.style.display = 'none', 5000);
+}
+
+document.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') criarAnuncio();
+});
+</script>
+</body>
+</html>
